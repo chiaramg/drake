@@ -1,11 +1,8 @@
-//
-// Created by chiara on 30.11.16.
-//
 
 #pragma once
 
-#ifndef CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
-#define CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
+//#ifndef CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
+//#define CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
 
 #include "drake/systems/framework/context.h"
 #include "drake/systems/framework/leaf_system.h"
@@ -17,29 +14,21 @@ namespace systems {
 /// A source bock which receives ROS messages
 
 template <typename T>
-class RPG_quad_ROS_receiverer : public LeafSystem<T>{
+class RPG_quad_ROS_receiver :public LeafSystem<T>{
  public:
- /// Constructs a system with a publisher to ROS
+    /// Constructs a system with a publisher to ROS
 
- void EvalOutput(const )
+    explicit RPG_quad_ROS_receiver();
 
- /// Returns the output port
- const SystemPortDescriptor<T>& get_output_port() const;
+    void EvalOutput(const Context<T>& context,
+                SystemOutput<T>* output) const override;
+
+    /// Returns the output port
+    const SystemPortDescriptor<T>&get_output_port() const;
 };
 
 
-}
+}   // namespace systems
 }   // namespace drake
 
-
-
-
-
-
-
-
-
-
-
-
-#endif //CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
+//#endif //CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H

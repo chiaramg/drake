@@ -8,23 +8,24 @@
 #include <ros/ros.h>
 #include "std_msgs/Float32MultiArray.h"
 
-class messages_chiara {
-public:
-    messages_chiara(ros::NodeHandle &nh_);
 
-    ~messages_chiara();
+        class messages_chiara {
+        public:
+            messages_chiara(ros::NodeHandle &nh_);
 
-    //Publishers
-    ros::Publisher pub;
+            ~messages_chiara();
 
-private:
-    //Subscribers
-    ros::Subscriber sub;
+            //Publishers
+            ros::Publisher pub;
 
-    //Callbacks
-    void firstCallback(const std_msgs::Float32MultiArray::ConstPtr &my_array);
+        private:
+            //Subscribers
+            ros::Subscriber sub;
 
-};
+            //Callbacks
+            void firstCallback(const std_msgs::Float32MultiArray::ConstPtr &my_array);
+
+        };
 
 #endif //CATKIN_WS_EXMPL_CHIARA_H
 

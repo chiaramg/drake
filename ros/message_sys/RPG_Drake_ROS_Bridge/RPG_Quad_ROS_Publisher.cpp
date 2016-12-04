@@ -75,7 +75,11 @@ void RPG_quad_ROS_publisher<T>::EvalOutput(const Context<T>& context,
 }   // namespace drake
 
 
+// does not build without the main function...
+// also when running, it's the following main function that gets called
+// (not the one from the message_sys.cpp)
 
+/*
 #include <iostream>
 
 int main(int argc, char* argv[]) {
@@ -83,3 +87,4 @@ int main(int argc, char* argv[]) {
     std::cout << "booah";
     return 0;
 }
+*/

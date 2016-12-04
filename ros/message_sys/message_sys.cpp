@@ -38,12 +38,12 @@ int do_main(int argc, char*argv[]) {
 
     auto diagram = builder.Build();
 
-
+/*
     systems::Simulator<double> simulator(*diagram);
 
     simulator.Initialize();
     simulator.StepTo(10);
-
+*/
     return 0;
 
 }
@@ -96,11 +96,11 @@ int do_main(int argc, char*argv[]) {
 } //drake
 
 
-
+// builds also without a main function
 #include <iostream>
 
 int main(int argc, char* argv[]){
- return drake::systems::do_main(argc, argv);
-    //std::cout<<"booah";
-    //return 0;
+ //return drake::systems::do_main(argc, argv);
+    std::cout<<"booah, eeey";
+    return 0;
 }

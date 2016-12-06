@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
     <name>message_sys</name>
     <version>0.0.0</version>
     <description>Try to create ros drake bridge</description>
@@ -17,22 +17,20 @@
     <depend>polynomial_trajectories</depend>
     <depend>eigen_catkin</depend>
     <depend>drake</depend>
-
 -->
-
 
   <buildtool_depend>catkin</buildtool_depend>
 
   <!--<build_depend>ackermann_msgs</build_depend>-->
-  <build_depend>drake</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>tf</build_depend>
+  <depend>drake</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
 
   <!--<run_depend>ackermann_msgs</run_depend>-->
-  <run_depend>drake</run_depend>
+ <!-- <run_depend>drake</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
-
+-->
 
     <export>
 

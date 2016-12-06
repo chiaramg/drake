@@ -32,7 +32,10 @@ int do_main(int argc, char*argv[]) {
 
     auto source = builder.AddSystem<systems::ConstantVectorSource>(vec);
 
-    auto publisher = builder.AddSystem<RPG_quad_ROS_publisher>();
+    auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
+
+    //auto publisher = builder.AddSystem(RPG_quad_ROS_publisher);
+    //auto publisher = builder.AddSystem<RPG_quad_ROS_publisher>();
 
     builder.Connect(source->get_output_port(), publisher->get_input_port(0));
 
@@ -95,12 +98,10 @@ int do_main(int argc, char*argv[]) {
 } // systems
 } //drake
 
-
-// builds also without a main function
 #include <iostream>
 
 int main(int argc, char* argv[]){
  //return drake::systems::do_main(argc, argv);
-    std::cout<<"booah, eeey";
+    std::cout<<"I'm the main function from the message_sys cpp file";
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "RPG_Quad_ROS_Publisher.h"
 
+
 #include "drake/systems/framework/leaf_context.h"
 #include <msgs_chiara.h>
 #include "std_msgs/Float32MultiArray.h"
@@ -7,7 +8,7 @@
 
 
 namespace drake {
-namespace systems{
+namespace systems {
 
 //template <typename T>
 //RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher();
@@ -22,6 +23,13 @@ messages_chiara(ros::NodeHandle& nh_)
 }
 */
 
+template<typename T>
+RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
+    this->DeclareOutputPort(kVectorValued, 1, kContinuousSampling);
+}
+
+template<typename T>
+RPG_quad_ROS_publisher<T>::~RPG_quad_ROS_publisher() {}
 
 template <typename T>
 const SystemPortDescriptor<T>&
@@ -70,21 +78,6 @@ void RPG_quad_ROS_publisher<T>::EvalOutput(const Context<T>& context,
     }
 }
 
-
+template class RPG_quad_ROS_publisher<double>;
 }   // namespace systems
 }   // namespace drake
-
-
-// does not build without the main function...
-// also when running, it's the following main function that gets called
-// (not the one from the message_sys.cpp)
-
-/*
-#include <iostream>
-
-int main(int argc, char* argv[]) {
-    //return drake::systems::do_main(argc, argv);
-    std::cout << "booah";
-    return 0;
-}
-*/

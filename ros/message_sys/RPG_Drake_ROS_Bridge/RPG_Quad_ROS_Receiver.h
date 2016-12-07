@@ -1,8 +1,4 @@
-
 #pragma once
-
-//#ifndef CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
-//#define CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H
 
 #include "drake/systems/framework/context.h"
 #include "drake/systems/framework/leaf_system.h"
@@ -30,5 +26,3 @@ class RPG_quad_ROS_receiver :public LeafSystem<T>{
 
 }   // namespace systems
 }   // namespace drake
-
-//#endif //CATKIN_WS_RPG_QUAD_ROS_RECEIVER_H

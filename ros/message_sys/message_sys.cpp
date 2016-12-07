@@ -50,49 +50,6 @@ int do_main(int argc, char*argv[]) {
     return 0;
 
 }
-///********************  Publish to ROS: *************************/
-///** Put the following somehow inside publisher output-port...  */
-///***************************************************************/
-//
-//
-//    ros::init(argc, argv, "publishVector");
-//    ros::NodeHandle n;
-//    ros::Publisher chatter_pub = n.advertise<std_msgs::Float32MultiArray>("chatter", 100);
-//
-//    ros::Rate loop_rate(10);
-//
-//    // create eigen::matrix
-///*    Eigen::MatrixXf eig_matrix(6,5);
-//
-//    for(int i=0; i<6; i++){
-//        for(int j=0; j<5; j++){
-//            eig_matrix(i, j) = i*5+j;
-//        }
-//    }
-//*/
-//    std_msgs::Float32MultiArray my_vec;
-//
-//    my_vec.data.clear();
-//
-//    for (int i = 0; i < 6; i++) {
-//            my_vec.data.push_back(vec(i));
-//    }
-//
-//    while(ros::ok()) {
-//        chatter_pub.publish(my_vec);
-//        ros::spinOnce();
-//        loop_rate.sleep();
-//    }
-//
-//    return 0;
-//}
-//
-//
-//
-//
-//}
-//} //message_sys
-
 
 
 } // systems
@@ -101,7 +58,7 @@ int do_main(int argc, char*argv[]) {
 #include <iostream>
 
 int main(int argc, char* argv[]){
- //return drake::systems::do_main(argc, argv);
-    std::cout<<"I'm the main function from the message_sys cpp file";
-    return 0;
+ return drake::systems::do_main(argc, argv);
+    //std::cout<<"I'm the main function from the message_sys cpp file";
+    //return 0;
 }

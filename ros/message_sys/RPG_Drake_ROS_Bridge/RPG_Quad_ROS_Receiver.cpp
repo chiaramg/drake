@@ -44,7 +44,6 @@ void RPG_quad_ROS_receiver<T>::EvalOutput(const Context<T>& context,
 
 
     //ros::spin();
-
 }
 
 }   // namespace systems

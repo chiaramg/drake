@@ -5,6 +5,8 @@
 #include <msgs_chiara.h>
 #include "std_msgs/Float32MultiArray.h"
 #include <Eigen/Dense>
+#include "drake/common/eigen_autodiff_types.h"
+#include "drake/common/drake_throw.h"
 
 
 namespace drake {
@@ -72,10 +74,12 @@ void RPG_quad_ROS_publisher<T>::EvalOutput(const Context<T>& context,
     while (ros::ok()) {
 
         firstMessage.pub.publish(my_array);
-
+        std::cout<<"message coming through...."<<std::endl;
         ros::spinOnce();
         loop_rate.sleep();
     }
+
+    //get_mutable_output(output);
 }
 
 template class RPG_quad_ROS_publisher<double>;

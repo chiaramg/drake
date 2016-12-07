@@ -27,11 +27,20 @@ messages_chiara(ros::NodeHandle& nh_)
 
 template<typename T>
 RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
+   this->DeclareInputPort(kVectorValued, 1, kContinuousSampling);
     this->DeclareOutputPort(kVectorValued, 1, kContinuousSampling);
 }
 
 template<typename T>
 RPG_quad_ROS_publisher<T>::~RPG_quad_ROS_publisher() {}
+
+
+template<typename T>
+const SystemPortDescriptor<T>&
+RPG_quad_ROS_publisher<T>::get_input_port() const {
+    return System<T>::get_input_port(0);
+}
+
 
 template <typename T>
 const SystemPortDescriptor<T>&
@@ -42,6 +51,8 @@ RPG_quad_ROS_publisher<T>::get_output_port() const {
 template <typename T>
 void RPG_quad_ROS_publisher<T>::EvalOutput(const Context<T>& context,
                                             SystemOutput<T>* output) const {
+    std::cout<<"reached this point"<<std::endl;
+
     DRAKE_ASSERT_VOID(System<T>::CheckValidOutput(output));
     DRAKE_ASSERT_VOID(System<T>::CheckValidContext(context));
 

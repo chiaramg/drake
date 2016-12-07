@@ -25,6 +25,9 @@ class RPG_quad_ROS_publisher : public LeafSystem<T> {
     void EvalOutput(const Context<T>& context,
                     SystemOutput<T>* output) const override;
 
+    // Returns the input port
+    const SystemPortDescriptor<T>&get_input_port() const;
+
     /// Returns the output port
     const SystemPortDescriptor<T>&get_output_port() const;
 };

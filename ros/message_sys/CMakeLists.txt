@@ -43,6 +43,7 @@ target_link_libraries(message_sys
   ${catkin_LIBRARIES}
   drakeCommon
   drakeSystemFramework
+  drakeSystemAnalysis
 )
 
 #add_library(message_sys message_sys.cpp)

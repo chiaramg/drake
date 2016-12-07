@@ -11,6 +11,9 @@
 #include "drake/systems/framework/primitives/constant_vector_source.h"
 
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.h"
+#include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.h"
+
+
 
 #include "ros/ros.h"
 #include "std_msgs/Float32MultiArray.h"
@@ -51,7 +54,15 @@ int do_main(int argc, char*argv[]) {
 
     //std::cout<<source.get_size()<<std::endl;
 
+    auto receiver = builder.AddSystem<RPG_quad_ROS_receiver>();
+
+
+
     builder.Connect(source->get_output_port(), publisher->get_input_port());
+
+
+    builder.Connect(publisher->get_output_port(), receiver->get_input_port());
+
 
     std::cout<<"I connected the diagram"<<std::endl;
 

@@ -14,10 +14,14 @@ class RPG_quad_ROS_receiver :public LeafSystem<T>{
  public:
     /// Constructs a system with a publisher to ROS
 
-    explicit RPG_quad_ROS_receiver();
+    RPG_quad_ROS_receiver();
+    ~RPG_quad_ROS_receiver() override;
 
     void EvalOutput(const Context<T>& context,
                 SystemOutput<T>* output) const override;
+
+    // returns input port
+    const SystemPortDescriptor<T>&get_input_port() const;
 
     /// Returns the output port
     const SystemPortDescriptor<T>&get_output_port() const;

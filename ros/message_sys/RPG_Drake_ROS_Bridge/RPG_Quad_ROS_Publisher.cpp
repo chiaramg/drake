@@ -9,10 +9,8 @@
 #include "drake/common/drake_throw.h"
 
 
-namespace drake {
-namespace systems {
-//namespace ros {
-//namespace message_sys {
+namespace ros {
+namespace message_sys {
 
 //template <typename T>
 //RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher();
@@ -29,8 +27,8 @@ messages_chiara(ros::NodeHandle& nh_)
 
         template<typename T>
         RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
-            this->DeclareInputPort(kVectorValued, 1, kContinuousSampling);
-            this->DeclareOutputPort(kVectorValued, 1, kContinuousSampling);
+            this->DeclareInputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
+            this->DeclareOutputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
         }
 
         template<typename T>
@@ -38,25 +36,25 @@ messages_chiara(ros::NodeHandle& nh_)
 
 
         template<typename T>
-        const SystemPortDescriptor <T> &
+        const drake::systems::SystemPortDescriptor <T> &
         RPG_quad_ROS_publisher<T>::get_input_port() const {
-            return System<T>::get_input_port(0);
+            return drake::systems::System<T>::get_input_port(0);
         }
 
 
         template<typename T>
-        const SystemPortDescriptor <T> &
+        const drake::systems::SystemPortDescriptor <T> &
         RPG_quad_ROS_publisher<T>::get_output_port() const {
-            return System<T>::get_output_port(0);
+            return drake::systems::System<T>::get_output_port(0);
         }
 
         template<typename T>
-        void RPG_quad_ROS_publisher<T>::EvalOutput(const Context <T> &context,
-                                                   SystemOutput <T> *output) const {
+        void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &context,
+                                                   drake::systems::SystemOutput <T> *output) const {
             std::cout << "reached this point" << std::endl;
 
-            DRAKE_ASSERT_VOID(System<T>::CheckValidOutput(output));
-            DRAKE_ASSERT_VOID(System<T>::CheckValidContext(context));
+            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
+            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
             //ros::init(argc, argv, "publishVector");
             ros::NodeHandle n;
@@ -99,6 +97,6 @@ messages_chiara(ros::NodeHandle& nh_)
         class RPG_quad_ROS_publisher<double>;
 
 
-//}
-}   // namespace systems
-}   // namespace drake
+
+}   // namespace message_sys
+}   // namespace ros

@@ -8,14 +8,13 @@
 #include "drake/systems/framework/leaf_system.h"
 #include "drake/systems/framework/system_output.h"
 
-namespace drake {
-namespace systems {
-//namespace ros {
-//namespace message_sys {
+
+namespace ros {
+namespace message_sys {
 /// A sink block with an output port, producing ROS messages
 
         template<typename T>
-        class RPG_quad_ROS_publisher : public LeafSystem<T> {
+        class RPG_quad_ROS_publisher : public drake::systems::LeafSystem<T> {
         public:
             /// Constructs a system with a publisher to ROS
 
@@ -24,17 +23,17 @@ namespace systems {
 
             ~RPG_quad_ROS_publisher() override;
 
-            void EvalOutput(const Context <T> &context,
-                                     SystemOutput <T> *output) const override;
+            void EvalOutput(const drake::systems::Context <T> &context,
+                            drake::systems::SystemOutput <T> *output) const override;
 
             // Returns the input port
-            const SystemPortDescriptor <T> &get_input_port() const;
+            const drake::systems::SystemPortDescriptor <T> &get_input_port() const;
 
             /// Returns the output port
-            const SystemPortDescriptor <T> &get_output_port() const;
+            const drake::systems::SystemPortDescriptor <T> &get_output_port() const;
         };
 
-}
-//}   // namespace ros
-}   // namespace drake
+
+}   // namespace message_sys
+}   // namespace ros
 

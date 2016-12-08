@@ -7,11 +7,8 @@
 #include <ros/ros.h>
 
 
-
-namespace drake {
-namespace systems {
-//namespace ros {
-//namespace message_sys {
+namespace ros {
+namespace message_sys {
 
 //template <typename T>
 //RPG_quad_ROS_receiver<T>::RPG_quad_ROS_receiver();
@@ -31,30 +28,30 @@ messages_chiara(ros::NodeHandle& nh_) {
 
         template<typename T>
         RPG_quad_ROS_receiver<T>::RPG_quad_ROS_receiver() {
-            this->DeclareInputPort(kVectorValued, 1, kContinuousSampling);
-            this->DeclareOutputPort(kVectorValued, 1, kContinuousSampling);
+            this->DeclareInputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
+            this->DeclareOutputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
         }
 
         template<typename T>
         RPG_quad_ROS_receiver<T>::~RPG_quad_ROS_receiver() {}
 
         template<typename T>
-        const SystemPortDescriptor <T> &
+        const drake::systems::SystemPortDescriptor <T> &
         RPG_quad_ROS_receiver<T>::get_input_port() const {
-            return System<T>::get_input_port(0);
+            return drake::systems::System<T>::get_input_port(0);
         }
 
         template<typename T>
-        const SystemPortDescriptor <T> &
+        const drake::systems::SystemPortDescriptor <T> &
         RPG_quad_ROS_receiver<T>::get_output_port() const {
-            return System<T>::get_output_port(0);
+            return drake::systems::System<T>::get_output_port(0);
         }
 
         template<typename T>
-        void RPG_quad_ROS_receiver<T>::EvalOutput(const Context <T> &context,
-                                                  SystemOutput <T> *output) const {
-            DRAKE_ASSERT_VOID(System<T>::CheckValidOutput(output));
-            DRAKE_ASSERT_VOID(System<T>::CheckValidContext(context));
+        void RPG_quad_ROS_receiver<T>::EvalOutput(const drake::systems::Context <T> &context,
+                                                  drake::systems::SystemOutput <T> *output) const {
+            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
+            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
             std::cout << "In the receiver" << std::endl;
 
@@ -69,8 +66,8 @@ messages_chiara(ros::NodeHandle& nh_) {
         class RPG_quad_ROS_receiver<double>;
 
 
-//}
-}   // namespace systems
-}   // namespace drake
+
+}   // namespace message_sys
+}   // namespace ros
 
 

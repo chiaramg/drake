@@ -22,74 +22,76 @@
 
 namespace drake{
 namespace systems{
+//namespace ros {
+//namespace message_sys {
 //namespace RPG_Drake_Ros_Bridge{
 //namespace{
 
-int do_main(int argc, char*argv[]) {
+        int do_main(int argc, char *argv[]) {
 
-    std::cout<<"I entered message_sys do_main function"<<std::endl;
+            std::cout << "I entered message_sys do_main function" << std::endl;
 
-    ros::init(argc, argv, "firstPublish");
+            ros::init(argc, argv, "firstPublish");
 
-    Eigen::VectorXd vec = Eigen::VectorXd::Zero(1);
+            Eigen::VectorXd vec = Eigen::VectorXd::Zero(1);
 
-    systems::DiagramBuilder<double> builder;
+            systems::DiagramBuilder<double> builder;
 
-    std::cout<<"I instantiated the builder"<<std::endl;
-
-
-    //float send(2.3);
-
-    auto source = builder.AddSystem<systems::ConstantVectorSource>(vec);
-    //auto source = builder.AddSystem<systems::ConstantVectorSource>(send);
-    std::cout<<"I added ConstVectorSource to the builder"<<std::endl;
+            std::cout << "I instantiated the builder" << std::endl;
 
 
-    auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
+            //float send(2.3);
 
-    std::cout<<"I added the publisher to the builder"<<std::endl;
-
-    //auto publisher = builder.AddSystem(RPG_quad_ROS_publisher);
-    //auto publisher = builder.AddSystem<RPG_quad_ROS_publisher>();
-
-    //std::cout<<source.get_size()<<std::endl;
-
-    auto receiver = builder.AddSystem<RPG_quad_ROS_receiver>();
+            auto source = builder.AddSystem<systems::ConstantVectorSource>(vec);
+            //auto source = builder.AddSystem<systems::ConstantVectorSource>(send);
+            std::cout << "I added ConstVectorSource to the builder" << std::endl;
 
 
+            auto publisher = builder.AddSystem <RPG_quad_ROS_publisher < double >> ();
 
-    builder.Connect(source->get_output_port(), publisher->get_input_port());
+            std::cout << "I added the publisher to the builder" << std::endl;
 
+            //auto publisher = builder.AddSystem(RPG_quad_ROS_publisher);
+            //auto publisher = builder.AddSystem<RPG_quad_ROS_publisher>();
 
-    builder.Connect(publisher->get_output_port(), receiver->get_input_port());
+            //std::cout<<source.get_size()<<std::endl;
 
-
-    std::cout<<"I connected the diagram"<<std::endl;
-
-
-    auto diagram = builder.Build();
-
-    std::cout<<"I built the diagram"<<std::endl;
-
-    systems::Simulator<double> simulator(*diagram);
+            auto receiver = builder.AddSystem<RPG_quad_ROS_receiver>();
 
 
+            builder.Connect(source->get_output_port(), publisher->get_input_port());
 
-   // systems::Context<double>* sim_context = 
-     //   diagram->GetMutableSubsystemContext(simulator.get_mutable_context(),
 
-    simulator.Initialize();
+            builder.Connect(publisher->get_output_port(), receiver->get_input_port());
 
-    std::cout<<"I initialized the simulator"<<std::endl;
 
-    simulator.StepTo(10);
+            std::cout << "I connected the diagram" << std::endl;
 
-    return 0;
+            auto diagram = builder.Build();
 
-}
+
+            std::cout << "I built the diagram" << std::endl;
+
+            systems::Simulator<double> simulator(*diagram);
+
+
+
+            // systems::Context<double>* sim_context = 
+            //   diagram->GetMutableSubsystemContext(simulator.get_mutable_context(),
+
+            simulator.Initialize();
+
+            std::cout << "I initialized the simulator" << std::endl;
+
+            simulator.StepTo(10);
+
+            return 0;
+
+        }
 
 
 } // systems
+//}
 } //drake
 
 #include <iostream>

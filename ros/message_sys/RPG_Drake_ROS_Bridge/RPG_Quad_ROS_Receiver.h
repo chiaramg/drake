@@ -6,27 +6,30 @@
 
 namespace drake {
 namespace systems {
-
+//namespace ros {
+// namespace message_sys {
 /// A source bock which receives ROS messages
 
-template <typename T>
-class RPG_quad_ROS_receiver :public LeafSystem<T>{
- public:
-    /// Constructs a system with a publisher to ROS
+        template<typename T>
+        class RPG_quad_ROS_receiver : public LeafSystem<T> {
+        public:
+            /// Constructs a system with a publisher to ROS
 
-    RPG_quad_ROS_receiver();
-    ~RPG_quad_ROS_receiver() override;
+            RPG_quad_ROS_receiver();
 
-    void EvalOutput(const Context<T>& context,
-                SystemOutput<T>* output) const override;
+            ~RPG_quad_ROS_receiver() override;
 
-    // returns input port
-    const SystemPortDescriptor<T>&get_input_port() const;
+            void EvalOutput(const Context <T> &context,
+                                     SystemOutput <T> *output) const override;
 
-    /// Returns the output port
-    const SystemPortDescriptor<T>&get_output_port() const;
-};
+            // returns input port
+            const SystemPortDescriptor <T> &get_input_port() const;
+
+            /// Returns the output port
+            const SystemPortDescriptor <T> &get_output_port() const;
+        };
 
 
-}   // namespace systems
+}
+//}   // namespace ros
 }   // namespace drake

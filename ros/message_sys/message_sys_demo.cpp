@@ -10,6 +10,7 @@
 #include "drake/systems/framework/system_input.h"
 
 #include "drake/systems/framework/primitives/constant_vector_source.h"
+#include "drake/systems/framework/primitives/linear_system.h"
 
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.h"
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.h"
@@ -40,18 +41,26 @@ namespace{
 
             //float send(2.3);
 
-            auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
+            //auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
-            /*
+
             // Initialize affine system
-            const Eigen::MatrixXd& A = 1;
-            const Eigen::MatrixXd& B = 1;
-            const Eigen::MatrixXd& C = 1;
-            const Eigen::MatrixXd& D = 1;
 
+
+           /* Eigen::MatrixXd A;
+            A[1,1] = 1.0;
+            Eigen::MatrixXd B = 1.0;
+            B[1,1];
+            Eigen::MatrixXd C = 1.0;
+            C[1,1];*/
+
+            Eigen::MatrixXd D;
+            D[1,1] = 1.0;
 
             // create affine system as the source
-            auto source = builder.AddSystem<drake::systems::AffineSystem>(send);*/
+            auto source = builder.AddSystem<drake::systems::LinearSystem(
+                    Eigen::MatrixXd::Identity(1,1), Eigen::MatrixXd::Identity(1,1),
+                            Eigen::MatrixXd::Zero(1,1), D)>;
 
             std::cout << "I added an affine system to the builder" << std::endl;
 

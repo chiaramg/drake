@@ -20,7 +20,6 @@ drake_setup_options()
 # External projects in order of dependencies; 'trivial' ones first
 drake_add_external(eigen PUBLIC CMAKE)
 drake_add_external(meshconverters PUBLIC CMAKE)
-drake_add_external(mosek PUBLIC MATLAB)
 drake_add_external(spdlog PUBLIC CMAKE)
 drake_add_external(swigmake PUBLIC CMAKE MATLAB PYTHON)
 drake_add_external(yalmip PUBLIC CMAKE MATLAB)
@@ -105,6 +104,13 @@ drake_add_external(ipopt PUBLIC AUTOTOOLS FORTRAN
     --with-blas=BUILD
     --with-lapack=BUILD
     --with-pic)
+
+# mosek
+drake_add_external(mosek PUBLIC CMAKE MATLAB
+  CMAKE_ARGS
+    -DBUILD_TESTING=OFF
+    -DWITH_MATLAB=${Matlab_FOUND}
+    -DWITH_PYTHON=OFF)
 
 # nlopt
 drake_add_external(nlopt PUBLIC CMAKE
@@ -207,6 +213,8 @@ drake_add_external(drake LOCAL PUBLIC CMAKE ALWAYS TEST MATLAB PYTHON
   BINARY_DIR ${PROJECT_BINARY_DIR}/drake
   CMAKE_ARGS
     -DDISABLE_MATLAB:BOOL=${DISABLE_MATLAB}
+    -DDISABLE_PYTHON:BOOL=${DISABLE_PYTHON}
+    -DDISABLE_FORTRAN:BOOL=${DISABLE_FORTRAN}
     -DWITH_AVL:BOOL=${WITH_AVL}
     -DWITH_BOT_CORE_LCMTYPES:BOOL=${WITH_BOT_CORE_LCMTYPES}
     -DWITH_BULLET:BOOL=${WITH_BULLET}
@@ -218,6 +226,7 @@ drake_add_external(drake LOCAL PUBLIC CMAKE ALWAYS TEST MATLAB PYTHON
     -DWITH_GOOGLE_STYLEGUIDE:BOOL=${WITH_GOOGLE_STYLEGUIDE}
     -DWITH_GTEST:BOOL=${WITH_GOOGLETEST}  # TODO(jamiesnape): Fix naming inconsistency
     -DWITH_GUROBI:BOOL=${WITH_GUROBI}
+    -DWITH_HSRB_DESCRIPTION:BOOL=${WITH_HSRB_DESCRIPTION}
     -DWITH_IPOPT:BOOL=${WITH_IPOPT}
     -DWITH_IRIS:BOOL=${WITH_IRIS}
     -DWITH_LCM:BOOL=${WITH_LCM}

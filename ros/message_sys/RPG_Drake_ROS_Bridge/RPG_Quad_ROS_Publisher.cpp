@@ -97,6 +97,5 @@ messages_chiara(ros::NodeHandle& nh_)
         class RPG_quad_ROS_publisher<double>;
 
 
-
 }   // namespace message_sys
 }   // namespace ros

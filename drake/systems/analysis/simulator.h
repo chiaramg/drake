@@ -9,8 +9,8 @@
 #include "drake/common/drake_assert.h"
 #include "drake/common/eigen_autodiff_types.h"
 #include "drake/common/text_logging.h"
-#include "drake/systems/analysis/integrator_base.h"
 #include "drake/systems/analysis/runge_kutta2_integrator.h"
+#include "drake/systems/analysis/integrator_base.h"
 #include "drake/systems/framework/context.h"
 #include "drake/systems/framework/system.h"
 
@@ -163,6 +163,22 @@ class Simulator {
    */
   double get_actual_realtime_rate() const;
 
+  /** Sets whether the simulation should invoke Publish on the System under
+   * simulation during every time step. If enabled, Publish will be invoked
+   * after discrete updates and before continuous integration. Regardless of
+   * whether publishing every time step is enabled, Publish will be invoked at
+   * Simulator initialize time, and as System<T>::CalcNextUpdateTime requests.
+   */
+  void set_publish_every_time_step(bool publish) {
+    publish_every_time_step_ = publish;
+  }
+
+  /** Returns true if the simulation should invoke Publish on the System under
+   * simulation every time step.  By default, returns true.
+   */
+  // TODO(sherm1, edrumwri): Consider making this false by default.
+  bool get_publish_every_time_step() const { return publish_every_time_step_; }
+
   /** Returns a const reference to the internally-maintained Context holding the
    * most recent step in the trajectory. This is suitable for publishing or
    * extracting information about this trajectory step.
@@ -229,7 +245,8 @@ class Simulator {
    */
   IntegratorBase<T>* get_mutable_integrator() { return integrator_.get(); }
 
-  /** Resets the integrator with a new one. An example usage is:
+  /**
+   * Resets the integrator with a new one. An example usage is:
    * @code
    * simulator.reset_integrator<ExplicitEulerIntegrator<double>>
    *               (sys, context, DT).
@@ -246,6 +263,12 @@ class Simulator {
     return static_cast<U*>(integrator_.get());
   }
 
+  /**
+   * Gets a constant reference to the system.
+   * @note a mutable reference is not available.
+   */
+  const System<T>& get_system() const { return system_; }
+
  private:
   // The steady_clock is immune to system clock changes so increases
   // monotonically. We'll work in fractional seconds.
@@ -255,13 +278,6 @@ class Simulator {
 
   Simulator(const Simulator& s) = delete;
   Simulator& operator=(const Simulator& s) = delete;
-
-  // Return a proposed end time for this step, and whether we picked that time
-  // because we hit the next update time.
-  static std::pair<T, bool> ProposeStepEndTime(const T& step_start_time,
-                                               const T& ideal_step_size,
-                                               const T& next_update_time,
-                                               const T& final_time);
 
   // If the simulated time in the context is ahead of real time, pause long
   // enough to let real time catch up (approximately).
@@ -286,6 +302,8 @@ class Simulator {
 
   // Slow down to this rate if possible (user settable).
   double target_realtime_rate_{0.};
+
+  bool publish_every_time_step_{true};
 
   // These are recorded at initialization or statistics reset.
   double initial_simtime_{nan()};  // Simulated time at start of period.
@@ -312,15 +330,16 @@ template <typename T>
 Simulator<T>::Simulator(const System<T>& system,
                         std::unique_ptr<Context<T>> context)
     : system_(system), context_(std::move(context)) {
-  // TODO(edrumwri): remove default step size
-  const double DT = 1e-3;
+  // Setup defaults that should be generally reasonable.
+  const double dt = 1e-3;
 
-  // create a context if necessary
+  // Create a context if necessary.
   if (!context_) context_ = system_.CreateDefaultContext();
 
-  // create a default integrator and initialize it.
+  // @TODO(edrumwri): Make variable step integrator default.
+  // Create a default integrator and initialize it.
   integrator_ = std::unique_ptr<IntegratorBase<T>>(
-      new RungeKutta2Integrator<T>(system_, DT, context_.get()));
+      new RungeKutta2Integrator<T>(system_, dt, context_.get()));
   integrator_->Initialize();
 
   discrete_updates_ = system_.AllocateDifferenceVariables();
@@ -334,11 +353,12 @@ void Simulator<T>::Initialize() {
   // Initialize the integrator.
   integrator_->Initialize();
 
-  // Do a publish before the simulation starts.
-  system_.Publish(*context_);
-
   // Restore default values.
   ResetStatistics();
+
+  // Do a publish before the simulation starts.
+  system_.Publish(*context_);
+  ++num_publishes_;
 
   // Initialize runtime variables.
   initialization_done_ = true;
@@ -361,8 +381,7 @@ void Simulator<T>::StepTo(const T& boundary_time) {
 
   // Updates/publishes can be triggered throughout the integration process,
   // but are not active at the start of the step.
-  bool update_hit = false;
-  bool publish_hit = false;
+  bool sample_time_hit = false;
 
   // Integrate until desired interval has completed.
   UpdateActions<T> update_actions;
@@ -375,11 +394,12 @@ void Simulator<T>::StepTo(const T& boundary_time) {
     PauseIfTooFast();
 
     // First take any necessary discrete actions.
-    if (update_hit) {
+    if (sample_time_hit) {
       for (const DiscreteEvent<T>& event : update_actions.events) {
         switch (event.action) {
           case DiscreteEvent<T>::kPublishAction: {
             system_.Publish(*context_, event);
+            ++num_publishes_;
             break;
           }
           case DiscreteEvent<T>::kUpdateAction: {
@@ -403,42 +423,43 @@ void Simulator<T>::StepTo(const T& boundary_time) {
     }
 
     // Allow System a chance to produce some output.
-    if (publish_hit) system_.Publish(*context_);
+    if (get_publish_every_time_step()) {
+      system_.Publish(*context_);
+      ++num_publishes_;
+    }
 
     // Remove old events
     update_actions.events.clear();
 
     // How far can we go before we have to take a sampling break?
-    const T next_update_time =
+    const T next_sample_time =
         system_.CalcNextUpdateTime(*context_, &update_actions);
-    DRAKE_ASSERT(next_update_time >= step_start_time);
-    const T next_update_dt = next_update_time - step_start_time;
+    DRAKE_ASSERT(next_sample_time >= step_start_time);
 
-    // TODO(edrumwri): Get the next publish time when API available.
+    // Determine whether the DiscreteEvent requested by the System at
+    // next_sample_time includes an Update action, a Publish action, or both.
+    T next_update_dt = std::numeric_limits<double>::infinity();
     T next_publish_dt = std::numeric_limits<double>::infinity();
-    T next_publish_time = step_start_time + next_publish_dt;
+    for (const DiscreteEvent<T>& event : update_actions.events) {
+      if (event.action == DiscreteEvent<T>::kUpdateAction) {
+        next_update_dt = next_sample_time - step_start_time;
+      }
+      if (event.action == DiscreteEvent<T>::kPublishAction) {
+        next_publish_dt = next_sample_time - step_start_time;
+      }
+    }
 
     // Attempt to integrate.
     typename IntegratorBase<T>::StepResult result =
-        integrator_->Step(next_publish_dt, next_update_dt);
+        integrator_->StepOnceAtMost(next_publish_dt, next_update_dt);
     switch (result) {
       case IntegratorBase<T>::kReachedUpdateTime:
-        update_hit = true;
-
-        // Check whether update time effectively identical to publish time.
-        publish_hit = (context_->get_time() >= next_publish_time);
-        break;
-
       case IntegratorBase<T>::kReachedPublishTime:
-        update_hit = false;
-        publish_hit = true;
+        sample_time_hit = true;
         break;
 
       case IntegratorBase<T>::kTimeHasAdvanced:
-        update_hit = false;
-        // TODO(edrumwri): Check if not publishing after every step, then
-        //                 turn this off if that is the case.
-        publish_hit = true;
+        sample_time_hit = false;
         break;
 
       default:
@@ -448,39 +469,6 @@ void Simulator<T>::StepTo(const T& boundary_time) {
 
     // TODO(sherm1) Constraint projection goes here.
   }
-
-  // publish at the end of the step
-  system_.Publish(*context_);
-}
-
-// TODO(edrumwri): Prepare to remove
-template <typename T>
-std::pair<T, bool> Simulator<T>::ProposeStepEndTime(const T& step_start_time,
-                                                    const T& ideal_step_size,
-                                                    const T& next_update_time,
-                                                    const T& final_time) {
-  static constexpr double kMaxStretch = 0.01;  // Allow 1% step size stretch.
-
-  // Start with the ideal step size.
-  T step_end_time = step_start_time + ideal_step_size;
-
-  // We can be persuaded to take a slightly bigger step if necessary to
-  // avoid a tiny sliver step before we have to do something discrete.
-  const T step_stretch_time = step_end_time + kMaxStretch * ideal_step_size;
-
-  // The step may be limited or stretched either by final time or update
-  // time, whichever comes sooner.
-  bool update_time_hit = false;
-  if (next_update_time <= final_time) {
-    if (next_update_time <= step_stretch_time) {
-      step_end_time = next_update_time;
-      update_time_hit = true;
-    }
-  } else {  // boundary_time < next_update_time.
-    if (final_time <= step_stretch_time) step_end_time = final_time;
-  }
-
-  return std::make_pair(step_end_time, update_time_hit);
 }
 
 }  // namespace systems

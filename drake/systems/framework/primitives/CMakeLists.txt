@@ -16,6 +16,8 @@ drake_install_headers(
   multiplexer.h
   pass_through.h
   pass_through-inl.h
+  random_source.h
+  signal_logger.h
   trajectory_source.h
   zero_order_hold.h
   zero_order_hold-inl.h

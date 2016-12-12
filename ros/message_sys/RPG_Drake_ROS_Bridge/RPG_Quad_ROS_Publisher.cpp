@@ -25,43 +25,68 @@ messages_chiara(ros::NodeHandle& nh_)
 }
 */
 
-        template<typename T>
-        RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
-            this->DeclareInputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
-            this->DeclareOutputPort(drake::systems::kVectorValued, 1, drake::systems::kContinuousSampling);
-        }
+template<typename T>
+RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
+  this->DeclareInputPort(drake::systems::kVectorValued, 1);
+  this->DeclareOutputPort(drake::systems::kVectorValued, 1);
+}
 
-        template<typename T>
-        RPG_quad_ROS_publisher<T>::~RPG_quad_ROS_publisher() {}
-
-
-        template<typename T>
-        const drake::systems::SystemPortDescriptor <T> &
-        RPG_quad_ROS_publisher<T>::get_input_port() const {
-            return drake::systems::System<T>::get_input_port(0);
-        }
+template<typename T>
+RPG_quad_ROS_publisher<T>::~RPG_quad_ROS_publisher() {}
 
 
-        template<typename T>
-        const drake::systems::SystemPortDescriptor <T> &
-        RPG_quad_ROS_publisher<T>::get_output_port() const {
-            return drake::systems::System<T>::get_output_port(0);
-        }
+template<typename T>
+const drake::systems::SystemPortDescriptor <T> &
+RPG_quad_ROS_publisher<T>::get_input_port() const {
+  return drake::systems::System<T>::get_input_port(0);
+}
 
-        template<typename T>
-        void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &context,
+
+template<typename T>
+const drake::systems::SystemPortDescriptor <T> &
+RPG_quad_ROS_publisher<T>::get_output_port() const {
+  return drake::systems::System<T>::get_output_port(0);
+}
+
+template<typename T>
+void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &context,
                                                    drake::systems::SystemOutput <T> *output) const {
-            std::cout << "reached this point" << std::endl;
+  std::cout << "In the EvalOutput function" << std::endl;
 
-            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
-            DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
+  DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
+  DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
-            //ros::init(argc, argv, "publishVector");
-            ros::NodeHandle n;
-            messages_chiara firstMessage(n); // firstMessage.sub, firstMessage.pub, firstMessage.firstCallback
-            ros::Rate loop_rate(10);
 
-            // create eigen::matrix
+
+  const drake::systems::BasicVector<T>* input = this->EvalVectorInput(context, 0);
+
+  const auto& input_values = input->get_value();
+
+  std_msgs::Float32MultiArray message_to_send;
+
+  message_to_send.data.clear();
+
+  int numbers_input = input_values.cols();
+
+  for (int i =0; i<numbers_input; i++){
+     message_to_send.data.push_back(input_values(i));
+  }
+  std::cout<<message_to_send<<std::endl;
+
+  //ros::init(argc, argv, "publishVector");
+  ros::NodeHandle n;
+  messages_chiara firstMessage(n); // firstMessage.sub, firstMessage.pub, firstMessage.firstCallback
+  ros::Rate loop_rate(10);
+
+
+
+
+  while (ros::ok()) {
+     firstMessage.pub.publish(message_to_send);
+  }
+
+/*
+  // create eigen::matrix
 
             Eigen::MatrixXf eig_matrix(6, 5);
 
@@ -91,11 +116,11 @@ messages_chiara(ros::NodeHandle& nh_)
             }
 
             //get_mutable_output(output);
+
+*/
         }
 
-        template
-        class RPG_quad_ROS_publisher<double>;
-
+template class RPG_quad_ROS_publisher<double>;
 
 }   // namespace message_sys
 }   // namespace ros

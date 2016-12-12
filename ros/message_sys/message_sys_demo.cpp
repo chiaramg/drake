@@ -11,6 +11,9 @@
 
 #include "drake/systems/framework/primitives/constant_vector_source.h"
 #include "drake/systems/framework/primitives/linear_system.h"
+#include "drake/systems/framework/primitives/zero_order_hold.h"
+
+
 
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.h"
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.h"
@@ -26,89 +29,69 @@ namespace ros {
 namespace message_sys {
 namespace{
 
-        int do_main(int argc, char *argv[]) {
+int do_main(int argc, char *argv[]) {
 
-            std::cout << "I entered message_sys do_main function" << std::endl;
+  //std::cout << "I entered message_sys do_main function" << std::endl;
 
-            ros::init(argc, argv, "firstPublish");
+  ros::init(argc, argv, "firstPublish");
 
-            Eigen::VectorXd vec = Eigen::VectorXd::Zero(1);
+  Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
 
-            drake::systems::DiagramBuilder<double> builder;
+  drake::systems::DiagramBuilder<double> builder;
 
-            std::cout << "I instantiated the builder" << std::endl;
-
-
-            //float send(2.3);
-
-            //auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
+  //std::cout << "I instantiated the builder" << std::endl;
 
 
-            // Initialize affine system
+  auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
-
-           /* Eigen::MatrixXd A;
-            A[1,1] = 1.0;
-            Eigen::MatrixXd B = 1.0;
-            B[1,1];
-            Eigen::MatrixXd C = 1.0;
-            C[1,1];*/
-
-            Eigen::MatrixXd D;
-            D[1,1] = 1.0;
-
-            // create affine system as the source
-            auto source = builder.AddSystem<drake::systems::LinearSystem(
+  // create affine system as the source
+  auto linear_system = builder.AddSystem<drake::systems::LinearSystem<double>>(
                     Eigen::MatrixXd::Identity(1,1), Eigen::MatrixXd::Identity(1,1),
-                            Eigen::MatrixXd::Zero(1,1), D)>;
+                    Eigen::MatrixXd::Identity(1,1), Eigen::MatrixXd::Zero(1,1));
 
-            std::cout << "I added an affine system to the builder" << std::endl;
-
-
-            auto publisher = builder.AddSystem <RPG_quad_ROS_publisher < double >> ();
-
-            std::cout << "I added the publisher to the builder" << std::endl;
-
-            //auto publisher = builder.AddSystem(RPG_quad_ROS_publisher);
-            //auto publisher = builder.AddSystem<RPG_quad_ROS_publisher>();
-
-            //std::cout<<source.get_size()<<std::endl;
-
-            auto receiver = builder.AddSystem<RPG_quad_ROS_receiver<double>>();
+  //std::cout << "I added an affine system to the builder" << std::endl;
 
 
-            builder.Connect(source->get_output_port(), publisher->get_input_port());
+  auto publisher = builder.AddSystem <RPG_quad_ROS_publisher < double >> ();
+
+  //std::cout << "I added the publisher to the builder" << std::endl;
+
+  //std::cout<<source.get_size()<<std::endl;
+
+  //auto receiver = builder.AddSystem<RPG_quad_ROS_receiver<double>>();
+
+  auto sink = builder.AddSystem<drake::systems::ZeroOrderHold<double>>(0.1, 1);
 
 
-            builder.Connect(publisher->get_output_port(), receiver->get_input_port());
+  builder.Connect(source->get_output_port(), linear_system->get_input_port());
+  builder.Connect(linear_system->get_output_port(), publisher->get_input_port());
 
-            builder.ExportOutput(receiver->get_output_port());
+  builder.Connect(publisher->get_output_port(), sink->get_input_port(0));
+
+  //builder.ExportOutput(receiver->get_output_port());
+
+  //std::cout << "I connected the diagram" << std::endl;
+
+  auto diagram = builder.Build();
+  //std::cout << "I built the diagram" << std::endl;
+
+  drake::systems::Simulator<double> simulator(*diagram);
 
 
-            std::cout << "I connected the diagram" << std::endl;
+  diagram->SetDefaultState(simulator.get_mutable_context());
 
-            auto diagram = builder.Build();
-
-
-            std::cout << "I built the diagram" << std::endl;
-
-            drake::systems::Simulator<double> simulator(*diagram);
+  simulator.Initialize();
 
 
 
-            // systems::Context<double>* sim_context = 
-            //   diagram->GetMutableSubsystemContext(simulator.get_mutable_context(),
+  //std::cout << "I initialized the simulator" << std::endl;
 
-            simulator.Initialize();
+  simulator.StepTo(10);
 
-            std::cout << "I initialized the simulator" << std::endl;
+  //std::cout<<"I finished simulating "<< std::endl;
 
-            simulator.StepTo(10);
-
-            std::cout<<"I finished simulating "<< std::endl;
-
-            return 0;
-        }
+  return 0;
+}
 
 
 }
@@ -118,7 +101,7 @@ namespace{
 
 int main(int argc, char* argv[]){
 
-    std::cout<<"I entered message_sys main function"<<std::endl;
+    //std::cout<<"I entered message_sys main function"<<std::endl;
 
  return ros::message_sys::do_main(argc, argv);
     //std::cout<<"I'm the main function from the message_sys cpp file";

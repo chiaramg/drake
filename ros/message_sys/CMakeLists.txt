@@ -31,7 +31,7 @@ include_directories(
 
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
-add_executable(message_sys
+add_executable(message_sys_demo
         message_sys_demo.cpp
     msgs_chiara.cpp
     RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cpp
@@ -39,7 +39,7 @@ add_executable(message_sys
 
 #target_link_libraries(message_sys message_sys.cpp)
 
-target_link_libraries(message_sys
+target_link_libraries(message_sys_demo
   ${catkin_LIBRARIES}
   drakeCommon
   drakeSystemFramework

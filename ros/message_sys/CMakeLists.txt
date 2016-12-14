@@ -35,8 +35,7 @@ add_executable(message_sys_demo
         message_sys_demo.cc
         msgs_chiara.cc
         RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
-        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc
-        quadrotor_plant.cc)
+        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
 
 #target_link_libraries(message_sys message_sys.cpp)
 
@@ -44,8 +43,23 @@ target_link_libraries(message_sys_demo
   ${catkin_LIBRARIES}
   drakeCommon
   drakeSystemFramework
-  drakeSystemAnalysis
-)
+  drakeSystemAnalysis)
+
+add_executable(quadrotor_lqr_demo
+        quadrotor_lqr_demo.cc
+        quadrotor_plant.cc)
+
+#target_link_libraries(message_sys message_sys.cpp)
+
+target_link_libraries(quadrotor_lqr_demo
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRigidBodyPlant
+        drakeRBM)
+
 
 #add_library(message_sys message_sys.cpp)
 

@@ -1,16 +1,18 @@
 #include "quadrotor_plant.h"
+#include "drake/systems/controllers/linear_quadratic_regulator.h"
 
-namespace drake {
-namespace examples {
-namespace quadrotor {
+
+namespace ros {
+namespace message_sys {
+
 
 template <typename T>
 QuadrotorPlant<T>::QuadrotorPlant(const double m, const double L,
                                   const Matrix3<T> I, const double kf,
                                   const double km)
     : g_(9.81), m_(m), L_(L), I_(I), kf_(kf), km_(km) {
-  this->DeclareInputPort(systems::kVectorValued, 4);
-  this->DeclareOutputPort(systems::kVectorValued, 12);
+  this->DeclareInputPort(drake::systems::kVectorValued, 4);
+  this->DeclareOutputPort(drake::systems::kVectorValued, 12);
 }
 
 template <typename T>
@@ -22,15 +24,15 @@ QuadrotorPlant<AutoDiffXd>* QuadrotorPlant<T>::DoToAutoDiffXd() const {
 }
 
 template <typename T>
-std::unique_ptr<systems::BasicVector<T>>
+std::unique_ptr<drake::systems::BasicVector<T>>
 QuadrotorPlant<T>::AllocateOutputVector(
-    const systems::SystemPortDescriptor<T>& descriptor) const {
+    const drake::systems::SystemPortDescriptor<T>& descriptor) const {
   DRAKE_THROW_UNLESS(descriptor.get_size() == 12);
-  return std::make_unique<systems::BasicVector<T>>(12);
+  return std::make_unique<drake::systems::BasicVector<T>>(12);
 }
 
 template <typename T>
-std::unique_ptr<systems::ContinuousState<T>>
+std::unique_ptr<drake::systems::ContinuousState<T>>
 QuadrotorPlant<T>::AllocateContinuousState() const {
   return std::make_unique<systems::ContinuousState<T>>(
       std::make_unique<systems::BasicVector<T>>(12), 6 /* num_q */,
@@ -38,16 +40,16 @@ QuadrotorPlant<T>::AllocateContinuousState() const {
 }
 
 template <typename T>
-void QuadrotorPlant<T>::EvalOutput(const systems::Context<T>& context,
-                                   systems::SystemOutput<T>* output) const {
+void QuadrotorPlant<T>::EvalOutput(const drake::systems::Context<T>& context,
+                                   drake::systems::SystemOutput<T>* output) const {
   output->GetMutableVectorData(0)
       ->set_value(context.get_continuous_state_vector().CopyToVector());
 }
 
 template <typename T>
 void QuadrotorPlant<T>::EvalTimeDerivatives(
-    const systems::Context<T>& context,
-    systems::ContinuousState<T>* derivatives) const {
+    const drake::systems::Context<T>& context,
+    drake::systems::ContinuousState<T>* derivatives) const {
   DRAKE_ASSERT_VOID(systems::System<T>::CheckValidContext(context));
 
   VectorX<T> state = context.get_continuous_state_vector().CopyToVector();
@@ -91,10 +93,49 @@ void QuadrotorPlant<T>::EvalTimeDerivatives(
   xdot << state.tail(6), xyz_ddot, rpy_ddot;
   derivatives->SetFromVector(xdot);
 }
-
+    ///
 template class QuadrotorPlant<double>;
 template class QuadrotorPlant<AutoDiffXd>;
 
-}  // namespace quadrotor
-}  // namespace examples
-}  // namespace drake
+///CHIARA::
+    std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
+            const QuadrotorPlant<double>* quad) {
+        auto context = quad->CreateDefaultContext();
+
+        // Set nominal torque to comp gravity...?
+
+
+        //context->FixInputPort(0, Eigen::VectorXd::Zero(0));
+
+        // Set nominal state to the upright fixed point.
+        //AcrobotStateVector<double>* x = dynamic_cast<AcrobotStateVector<double>*>(
+        //        context->get_mutable_continuous_state_vector());
+        //DRAKE_ASSERT(x != nullptr);
+
+        // set goal state:
+        //Eigen::VectorXf* goal_state = Eigen::VectorXf::Zero(12);
+        //goal_state(2) += 1.0;
+
+       // Eigen::Vector12f* goal_state = dynamic_cast<Eigen::Vector12f*>(
+         //       context->get_mutable_continuous_state_vector());
+
+        //goal_state
+
+        // Setup LQR Cost matrices (penalize position error 10x more than velocity
+        // to roughly address difference in units, using sqrt(g/l) as the time
+        // constant.
+
+        Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(12, 12);
+        //Q(0, 0) = 10;
+        //Q(1, 1) = 10;
+        Q *= 10;
+
+        Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
+
+        return drake::systems::LinearQuadraticRegulator(*quad, *context, Q, R);
+    }
+
+
+
+}  // namespace message_sys
+}  // namespace ros

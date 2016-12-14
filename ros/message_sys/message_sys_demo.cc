@@ -17,8 +17,8 @@
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.h"
 
 // from Philips implementations:
-#include "quadrotor_plant.h"
-#include "drake/systems/controllers/linear_quadratic_regulator.h"
+//#include "quadrotor_plant.h"
+//#include "drake/systems/controllers/linear_quadratic_regulator.h"
 
 #include "ros/ros.h"
 #include "std_msgs/Float32MultiArray.h"
@@ -57,7 +57,7 @@ int do_main(int argc, char *argv[]) {
 */
 
   ///  IN PROGRESS: SYSTEM WITH RECEIVER-TO-PUBLISHER
-
+/*
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
@@ -74,9 +74,9 @@ int do_main(int argc, char *argv[]) {
 
   std::cout << "whole diagram connected" << std::endl;
 
-
+*/
   ///   IN PROGRESS: LQR
-/*
+
   //MatrixX<double> Q = MatrixX<double>::Identity(12,12);
   Eigen::MatrixXf Q = Eigen::MatrixXf::Identity(12, 12);
   //Q << Eigen::MatrixXf::Identity;
@@ -92,21 +92,21 @@ int do_main(int argc, char *argv[]) {
   // we want to receive the state of the quadrotor:
   auto receiver = builder.AddSystem<RPG_quad_ROS_receiver<double>>();
 
-  auto quad = builder.AddSystem<QuadrotorPlant<double>>();
+//  auto quad = builder.AddSystem<QuadrotorPlant<double>>();
   // system with 4 inputs: thrusts for each rotor & 12 outputs (statevector)
 
-  auto quad_context_goal = quad->CreateDefaultContext();
+//  auto quad_context_goal = quad->CreateDefaultContext();
   //quad->set_state(quad_context_goal.get(), xg);
 
-  auto controller = builder.AddSystem(drake::systems::LinearQuadraticRegulator(
-                                                *quad, *quad_context_goal, Q, R));
+//  auto controller = builder.AddSystem(drake::systems::LinearQuadraticRegulator(
+                                                //*quad, *quad_context_goal, Q, R));
 
   auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
 
-  builder.Connect(receiver->get_output_port(0), controller->get_input_port());
-  builder.Connect(controller->get_output_port(),quad->get_input_port(0)); // u = -K*x
-  builder.Connect(controller->get_output_port(0), publisher->get_input_port(0)); // K
-*/
+//  builder.Connect(receiver->get_output_port(0), controller->get_input_port());
+//  builder.Connect(controller->get_output_port(),quad->get_input_port(0)); // u = -K*x
+//  builder.Connect(controller->get_output_port(0), publisher->get_input_port(0)); // K
+
 
   auto diagram = builder.Build();
 

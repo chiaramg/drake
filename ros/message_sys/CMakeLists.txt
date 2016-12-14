@@ -32,10 +32,10 @@ include_directories(
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
 add_executable(message_sys_demo
-        message_sys_demo.cpp
-    msgs_chiara.cpp
-    RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cpp
-    RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cpp)
+        message_sys_demo.cc
+        msgs_chiara.cc
+        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
+        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
 
 #target_link_libraries(message_sys message_sys.cpp)
 

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>message_sys</name>
+    <version>0.0.0</version>
+    <description>Try to create ros drake bridge</description>
+
+
+    <maintainer email="chiarag@student.ethz.ch">Chiara Giorgetti</maintainer>
+    <license>GNU GPL</license>
+
+<!--
+    <depend>roscpp</depend>
+    <depend>std_msgs</depend>
+    <depend>quad_common</depend>
+    <depend>quad_msgs</depend>
+    <depend>quad_demo_common</depend>
+    <depend>polynomial_trajectories</depend>
+    <depend>eigen_catkin</depend>
+    <depend>drake</depend>
+-->
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!--<build_depend>ackermann_msgs</build_depend>-->
+  <depend>drake</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+
+  <!--<run_depend>ackermann_msgs</run_depend>-->
+ <!-- <run_depend>drake</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf</run_depend>
+-->
+
+    <export>
+
+    </export>
+</package>

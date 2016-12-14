@@ -19,7 +19,7 @@
 
 // from Philips implementations:
 //#include "drake/examples/Quadrotor/quadrotor_plant.h"
-//#include "drake/systems/controllers/linear_optimal_control.h"
+//#include "drake/systems/controllers/linear_quadratic_regulator.h"
 
 #include "ros/ros.h"
 #include "std_msgs/Float32MultiArray.h"
@@ -40,6 +40,7 @@ int do_main(int argc, char *argv[]) {
 
 
   ///  WORKING DIAGRAM LINEAR SYSTEM-PUBLISHER
+/*
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
@@ -54,10 +55,11 @@ int do_main(int argc, char *argv[]) {
   builder.Connect(source->get_output_port(), linear_system->get_input_port());
   builder.Connect(linear_system->get_output_port(), publisher->get_input_port());
   builder.Connect(publisher->get_output_port(), sink->get_input_port(0));
-
+*/
 
   ///  IN PROGRESS: SYSTEM WITH RECEIVER-TO-PUBLISHER
-/*  Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
+
+  Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
   auto receiver = builder.AddSystem<RPG_quad_ROS_receiver<double>>();
@@ -65,57 +67,61 @@ int do_main(int argc, char *argv[]) {
   std::cout << "Added the receiver to the system" << std::endl;
 
   auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
-  auto sink = builder.AddSystem<drake::systems::ZeroOrderHold<double>>(0.1, 1);
+  //auto sink = builder.AddSystem<drake::systems::ZeroOrderHold<double>>(0.1, 1);
 
   builder.Connect(source->get_output_port(), receiver->get_input_port());
   builder.Connect(receiver->get_output_port(), publisher->get_input_port());
-  builder.Connect(publisher->get_output_port(), sink->get_input_port(0));
+  //builder.Connect(publisher->get_output_port(), sink->get_input_port(0));
 
   std::cout << "whole diagram connected" << std::endl;
-*/
+
 
 
 /// First start of LQR
 /*
-    MatrixX<double> Q = MatrixX<double>::Identity(12,12);
-    Q.block<3,3>(0,0) *= 10.0;
-    Q.block<3,3>(9,9) *= 10.0;
+  MatrixX<double> Q = MatrixX<double>::Identity(12,12);
+  Q.block<3,3>(0,0) *= 10.0;
+  Q.block<3,3>(9,9) *= 10.0;
 
-    MatrixX<double> R = MatrixX<double>::Identity(4,4);
-    R *= 10.0;
+  MatrixX<double> R = MatrixX<double>::Identity(4,4);
+  R *= 10.0;
 
-    auto quad = builder.AddSystem<QuadrotorPlant<double>>();
-    // system with 4 inputs: thrusts for each rotor & 12 outputs (statevector)
 
-    auto quad_context_goal = quad->CreateDefaultContext();
-    quad->set_state(quad_context_goal.get(), xg);
+  // we want to receive the state of the quadrotor:
+  auto receiver = builder.AddSystem<RPG_quad_ROS_receiver<double>>();
 
-    auto controller = builder.AddSystem(drake::systems::LinearQuadraticRegulator(
+  auto quad = builder.AddSystem<QuadrotorPlant<double>>();
+  // system with 4 inputs: thrusts for each rotor & 12 outputs (statevector)
+
+  auto quad_context_goal = quad->CreateDefaultContext();
+  quad->set_state(quad_context_goal.get(), xg);
+
+  auto controller = builder.AddSystem(drake::systems::LinearQuadraticRegulator(
                                 *quad, *quad_context_goal, Q, R));
 
-    auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
+  auto publisher = builder.AddSystem<RPG_quad_ROS_publisher<double>>();
 
 
-    builder.Connect(quad->get_output_port(0), controller->get_input_port());
-    builder.Connect(controller->get_output_port(),quad->get_input_port(0));
-    builder.Connect(quad->get_output_port(0), publisher->get_input_port(0));
+  builder.Connect(receiver->get_output_port(0), controller->get_input_port());
+  builder.Connect(controller->get_output_port(),quad->get_input_port(0)); // u = -K*x
+  builder.Connect(controller->get_output_port(0), publisher->get_input_port(0)); // K
 */
 
-    auto diagram = builder.Build();
+  auto diagram = builder.Build();
 
-    drake::systems::Simulator<double> simulator(*diagram);
+  drake::systems::Simulator<double> simulator(*diagram);
 
-    diagram->SetDefaultState(simulator.get_mutable_context());
+  diagram->SetDefaultState(simulator.get_mutable_context());
 
-    simulator.Initialize();
+  simulator.Initialize();
 
-    std::cout << "Simulator initialized" << std::endl;
+  std::cout << "Simulator initialized" << std::endl;
 
-    simulator.StepTo(10);  //goes into EvalOutput of the publisher
+  simulator.StepTo(10);  //goes into EvalOutput of the publisher
 
-    std::cout << "Simulator StepTo" << std::endl;
+  std::cout << "Simulator StepTo" << std::endl;
 
-    std::cout<<"I finished simulating "<< std::endl;
+  std::cout<<"I finished simulating "<< std::endl;
 
   return 0;
 }
@@ -129,6 +135,6 @@ int main(int argc, char* argv[]){
     //std::cout<<"I entered message_sys main function"<<std::endl;
 
  return ros::message_sys::do_main(argc, argv);
-    //std::cout<<"I'm the main function from the message_sys cpp file";
+    //std::cout<<"I'm the main function from the message_sys_demo.cc file";
     //return 0;
 }

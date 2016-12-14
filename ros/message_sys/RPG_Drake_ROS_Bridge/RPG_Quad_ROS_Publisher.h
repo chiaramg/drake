@@ -14,24 +14,26 @@ namespace message_sys {
 /// A sink block with an output port, producing ROS messages
 
         template<typename T>
-        class RPG_quad_ROS_publisher : public drake::systems::LeafSystem<T> {
-        public:
-            /// Constructs a system with a publisher to ROS
+class RPG_quad_ROS_publisher : public drake::systems::LeafSystem<T> {
+  public:
+  /// Constructs a system with a publisher to ROS
 
-            //explicit RPG_quad_ROS_publisher();
-            RPG_quad_ROS_publisher();
+   //explicit RPG_quad_ROS_publisher();
+   RPG_quad_ROS_publisher();
 
-            ~RPG_quad_ROS_publisher() override;
+   ~RPG_quad_ROS_publisher() override;
 
-            void EvalOutput(const drake::systems::Context <T> &context,
+   void DoPublish(const drake::systems::Context<T>& context) const override;
+
+   void EvalOutput(const drake::systems::Context <T> &context,
                             drake::systems::SystemOutput <T> *output) const override;
 
-            // Returns the input port
-            const drake::systems::SystemPortDescriptor <T> &get_input_port() const;
+   // Returns the input port
+   const drake::systems::SystemPortDescriptor <T> &get_input_port() const;
 
-            /// Returns the output port
-            const drake::systems::SystemPortDescriptor <T> &get_output_port() const;
-        };
+   /// Returns the output port
+   const drake::systems::SystemPortDescriptor <T> &get_output_port() const;
+};
 
 
 }   // namespace message_sys

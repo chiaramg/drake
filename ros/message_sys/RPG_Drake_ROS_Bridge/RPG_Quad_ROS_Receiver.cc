@@ -68,11 +68,11 @@ void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr&
 {
 
 
-    std::cout << "This is the listener inside Drake, receiving message" << std::endl;
+  std::cout << "This is the listener inside Drake, receiving message" << std::endl;
 
   std::vector<float> temp = my_array->data;
 
-    //this->received_message = my_array->received_message;
+  //this->received_message = my_array->received_message;
 
 
   Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
@@ -96,45 +96,100 @@ void RPG_quad_ROS_receiver<T>::EvalOutput(const drake::systems::Context <T> &con
   DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
   DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
+  drake::systems::BasicVector<T>* output_vector = output->GetMutableVectorData(0);
+
+  std::cout << "BasicVector<T> output_vector" << std::endl;
+
+  auto y = output_vector->get_mutable_value();
+  std::cout << "auto y" << std::endl;
+
+/*  DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
+
   std::cout << "In the receiver" << std::endl;
     
   ros::NodeHandle n;
 
-    std::cout << "NodeHandle created in the receiver" << std::endl;
+  std::cout << "NodeHandle created in the receiver" << std::endl;
 
 
-    //ros::Subscriber sub = n.subscribe("chatter", 100, firstCallback);
+  //ros::Subscriber sub = n.subscribe("chatter", 100, firstCallback);
 
   messages_chiara ObstacleMessage(n);
 
-    std::cout << "obstacle of class messages_chiara created" << std::endl;
+  std::cout << "obstacle of class messages_chiara created" << std::endl;
 
 
-    //std::cout<<ObstacleMessage.received_message<<std::endl;
+  //std::cout<<ObstacleMessage.received_message<<std::endl;
 
-/// TODO: put received_message into outputport of the receiver!!
+  // put received_message into outputport of the receiver!!
 
 
   //std::vector<float> temp = my_array->data;
 
- // Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
+  // Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
 
 
-    //Eigen::MatrixXf message_content = receiveMessage.received_message;
+  //Eigen::MatrixXf message_content = receiveMessage.received_message;
 
   drake::systems::BasicVector<T>* output_vector = output->GetMutableVectorData(0);
 
-    std::cout << "BasicVector<T> output_vector" << std::endl;
+  std::cout << "BasicVector<T> output_vector" << std::endl;
 
-    auto y = output_vector->get_mutable_value();
-    std::cout << "auto y" << std::endl;
+  auto y = output_vector->get_mutable_value();
+  std::cout << "auto y" << std::endl;
 
   //std_msgs::Float32MultiArray* my_array;
 
   //messages_chiara::firstCallback(&my_array);
   //System<T>::GetMutableOutputVector(output, 0) = ; //received message
   //ros::spin();
+*/
 }
+
+
+template<typename T>
+void RPG_quad_ROS_receiver<T>::DoPublish(const drake::systems::Context<T>& context) const {
+  //DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
+  DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
+
+  std::cout << "In the receiver" << std::endl;
+
+  ros::NodeHandle n;
+
+  std::cout << "NodeHandle created in the receiver" << std::endl;
+
+
+  //ros::Subscriber sub = n.subscribe("chatter", 100, firstCallback);
+
+  messages_chiara ObstacleMessage(n);
+
+  std::cout << "obstacle of class messages_chiara created" << std::endl;
+
+
+  //std::cout<<ObstacleMessage.received_message<<std::endl;
+
+  // put received_message into outputport of the receiver!!
+
+
+  //std::vector<float> temp = my_array->data;
+
+  // Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
+
+
+  //Eigen::MatrixXf message_content = receiveMessage.received_message;
+
+
+
+  //std_msgs::Float32MultiArray* my_array;
+
+  //messages_chiara::firstCallback(&my_array);
+  //System<T>::GetMutableOutputVector(output, 0) = ; //received message
+  //ros::spin();
+
+}
+
+
+
 
 template class RPG_quad_ROS_receiver<double>;
 

@@ -84,7 +84,7 @@ template<typename T>
 void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &context,
                                                    drake::systems::SystemOutput <T> *output) const {
   std::cout << "In the EvalOutput function of the publisher" << std::endl;
-
+/*
   DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
   DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
@@ -122,41 +122,52 @@ void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &co
      //firstMessage.pub.publish(message_to_send);
       chatter_pub.publish(message_to_send);
   }
-
-/*
-  // create eigen::matrix
-
-            Eigen::MatrixXf eig_matrix(6, 5);
-
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 5; j++) {
-                    eig_matrix(i, j) = i * 5 + j;
-                }
-            }
-
-            std_msgs::Float32MultiArray my_array;
-
-            my_array.data.clear();
-
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 5; j++) {
-                    my_array.data.push_back(eig_matrix(i, j));
-                }
-            }
-
-
-            while (ros::ok()) {
-
-                firstMessage.pub.publish(my_array);
-                std::cout << "message coming through...." << std::endl;
-                ros::spinOnce();
-                loop_rate.sleep();
-            }
-
-            //get_mutable_output(output);
-
 */
-        }
+}
+
+template<typename T>
+void RPG_quad_ROS_publisher<T>::DoPublish(const drake::systems::Context<T>& context) const {
+
+  std::cout << "In the doPublish function of the publisher" << std::endl;
+
+  DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
+
+  std::cout << "in doPublish, entering EvalVectorInput" << std::endl;
+
+  const drake::systems::BasicVector<T>* input = this->EvalVectorInput(context, 0);
+
+  std::cout << "in doPublish, exit EvalVectorInput" << std::endl;
+
+  const auto& input_values = input->get_value();
+
+  std_msgs::Float32MultiArray message_to_send;
+
+  message_to_send.data.clear();
+
+  int numbers_input = input_values.cols();
+
+  for (int i =0; i<numbers_input; i++){
+    message_to_send.data.push_back(input_values(i));
+  }
+
+  std::cout<<input_values<<std::endl;
+
+  //ros::init(argc, argv, "publishVector");
+  ros::NodeHandle nh;
+  //messages_chiara firstMessage(n); // firstMessage.sub, firstMessage.pub, firstMessage.firstCallback
+  ros::Publisher chatter_pub = nh.advertise<std_msgs::Float32MultiArray>("chatter2", 100);
+
+  ros::Rate loop_rate(10);
+
+
+
+
+  while (ros::ok()) {
+    //firstMessage.pub.publish(message_to_send);
+    chatter_pub.publish(message_to_send);
+  }
+}
+
 
 template class RPG_quad_ROS_publisher<double>;
 

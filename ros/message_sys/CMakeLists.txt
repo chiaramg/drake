@@ -35,7 +35,8 @@ add_executable(message_sys_demo
         message_sys_demo.cc
         msgs_chiara.cc
         RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
-        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
+        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc
+        quadrotor_plant.cc)
 
 #target_link_libraries(message_sys message_sys.cpp)
 

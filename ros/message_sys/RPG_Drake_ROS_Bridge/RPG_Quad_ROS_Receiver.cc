@@ -19,21 +19,22 @@ messages_chiara::messages_chiara(ros::NodeHandle& nh_){
 
     //SUBSCRIBERS
 
-    sub = nh_.subscribe("chatter1", 1, &messages_chiara::firstCallback,this);
+  sub = nh_.subscribe("chatter1", 1, &messages_chiara::firstCallback,this);
 
-    std::cout << "subscribed to Chatter1" << std::endl;
+  std::cout << "subscribed to Chatter1" << std::endl;
     //PUBLISHERS
     //pub = nh_.advertise<std_msgs::Float32MultiArray>("chat2", 100);
 }
-
 
 messages_chiara::~messages_chiara(){}
 
 
 template<typename T>
 RPG_quad_ROS_receiver<T>::RPG_quad_ROS_receiver() {
+  //this->DeclareInputPort(drake::systems::kVectorValued, 1);
+  //this->DeclareOutputPort(drake::systems::kVectorValued, 1);
   this->DeclareInputPort(drake::systems::kVectorValued, 1);
-  this->DeclareOutputPort(drake::systems::kVectorValued, 1);
+  this->DeclareOutputPort(drake::systems::kVectorValued, 12);
 }
 
 template<typename T>
@@ -61,19 +62,16 @@ messages_chiara::messages_chiara(ros::NodeHandle& nh_) {
   pub = nh_.advertise<std_msgs::Float32MultiArray>("chat2", 100);
 }*/
 
-
 void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array)//,
                                     //const drake::systems::Context<double> &context,
                                     //drake::systems::SystemOutput<double> *output)
 {
-
 
   std::cout << "This is the listener inside Drake, receiving message" << std::endl;
 
   std::vector<float> temp = my_array->data;
 
   //this->received_message = my_array->received_message;
-
 
   Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
 

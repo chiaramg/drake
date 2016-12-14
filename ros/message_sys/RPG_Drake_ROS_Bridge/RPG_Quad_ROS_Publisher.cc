@@ -1,6 +1,5 @@
 #include "RPG_Quad_ROS_Publisher.h"
 
-
 #include "drake/systems/framework/leaf_context.h"
 #include <msgs_chiara.h>
 #include "std_msgs/Float32MultiArray.h"
@@ -8,22 +7,8 @@
 #include "drake/common/eigen_autodiff_types.h"
 #include "drake/common/drake_throw.h"
 
-
 namespace ros {
 namespace message_sys {
-
-//template <typename T>
-//RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher();
-/*
-messages_chiara(ros::NodeHandle& nh_)
-{
-    //SUBSCRIBERS
-    sub = nh_.subscribe("chat2", 100, &messages_chiara::firstCallback,this);
-
-    //PUBLISHERS
-    pub = nh_.advertise<std_msgs::Float32MultiArray>("chatter", 1);
-}
-*/
 
 template<typename T>
 RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
@@ -34,13 +19,11 @@ RPG_quad_ROS_publisher<T>::RPG_quad_ROS_publisher() {
 template<typename T>
 RPG_quad_ROS_publisher<T>::~RPG_quad_ROS_publisher() {}
 
-
 template<typename T>
 const drake::systems::SystemPortDescriptor <T> &
 RPG_quad_ROS_publisher<T>::get_input_port() const {
   return drake::systems::System<T>::get_input_port(0);
 }
-
 
 template<typename T>
 const drake::systems::SystemPortDescriptor <T> &
@@ -48,36 +31,21 @@ RPG_quad_ROS_publisher<T>::get_output_port() const {
   return drake::systems::System<T>::get_output_port(0);
 }
 /*
-
-        messages_chiara::messages_publisher(ros::NodeHandle& nh_)
-
-        {
+        messages_chiara::messages_publisher(ros::NodeHandle& nh_) {
             //SUBSCRIBERS not required
             sub = nh_.subscribe("chat2", 100, &messages_publisher::firstCallback,this);
-
             //PUBLISHERS
             pub = nh_.advertise<std_msgs::Float32MultiArray>("chatter", 1);
-
         }
 
         messages_chiara::~messages_chiara(){}
 
-        void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array)
-        {
+        void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array){
             std::cout << "This is the initial talker, Message received" << std::endl;
-
             std::vector<float> temp = my_array->data;
-
             Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
-
             std::cout << my_mat << std::endl;
-
         }
-
-
-
-
-
 */
 
 template<typename T>
@@ -114,9 +82,6 @@ void RPG_quad_ROS_publisher<T>::EvalOutput(const drake::systems::Context <T> &co
   ros::Publisher chatter_pub = nh.advertise<std_msgs::Float32MultiArray>("chatter2", 100);
 
   ros::Rate loop_rate(10);
-
-
-
 
   while (ros::ok()) {
      //firstMessage.pub.publish(message_to_send);
@@ -158,9 +123,6 @@ void RPG_quad_ROS_publisher<T>::DoPublish(const drake::systems::Context<T>& cont
   ros::Publisher chatter_pub = nh.advertise<std_msgs::Float32MultiArray>("chatter2", 100);
 
   ros::Rate loop_rate(10);
-
-
-
 
   while (ros::ok()) {
     //firstMessage.pub.publish(message_to_send);

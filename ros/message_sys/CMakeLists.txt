@@ -47,7 +47,8 @@ target_link_libraries(message_sys_demo
 
 add_executable(quadrotor_lqr_demo
         quadrotor_lqr_demo.cc
-        quadrotor_plant.cc)
+        quadrotor_plant.cc
+        lqr_demo_publisher.cc)
 
 #target_link_libraries(message_sys message_sys.cpp)
 
@@ -58,7 +59,10 @@ target_link_libraries(quadrotor_lqr_demo
         drakeSystemAnalysis
         drakeLinearControl
         drakeRigidBodyPlant
-        drakeRBM)
+        drakeRBM
+        drakeLCMTypes
+        lcm
+        drakeLCMSystem2)
 
 
 #add_library(message_sys message_sys.cpp)

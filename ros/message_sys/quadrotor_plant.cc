@@ -103,7 +103,7 @@ template class QuadrotorPlant<AutoDiffXd>;
         //auto context = quad->CreateDefaultContext();
 
         // Set nominal torque to comp gravity...?
-        
+
         auto quad_context_goal = quad->CreateDefaultContext();
 
         // --> steady state hover input?
@@ -116,7 +116,9 @@ template class QuadrotorPlant<AutoDiffXd>;
 
         Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);
 
-        u0 *= quad->m_ * quad->g_ / 4;
+        //const double m = quad->m();
+
+        u0 *=  quad->m() * quad->g() / 4;
 
         quad_context_goal->FixInputPort(0, u0);
         quad->set_state(quad_context_goal.get(), x0);

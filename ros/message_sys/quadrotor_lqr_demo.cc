@@ -2,7 +2,7 @@
 
 #include <gflags/gflags.h>
 
-//#include "drake/multibody/rigid_body_plant/drake_visualizer.h"
+#include "drake/multibody/rigid_body_plant/drake_visualizer.h"
 #include "drake/common/drake_path.h"
 #include "drake/multibody/rigid_body_tree.h"
 #include "drake/systems/analysis/simulator.h"
@@ -14,8 +14,10 @@
 #include "drake/common/text_logging.h"
 #include "drake/lcm/drake_lcm.h"
 #include "drake/multibody/parser_sdf.h"
-//#include "drake/multibody/rigid_body_plant/drake_visualizer.h"
 #include "drake/systems/framework/primitives/constant_vector_source.h"
+#include "lqr_demo_publisher.h"
+
+#include "ros/ros.h"
 
 #include "quadrotor_plant.h"
 
@@ -32,12 +34,13 @@ namespace {
 */
 int do_main(int argc, char *argv[]) {
 
+        lcm::DrakeLcm lcm;
+
+        RigidBodyTree<double> tree(
+                GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
+                multibody::joints::kRollPitchYaw);
 
        // gflags::ParseCommandLineFlags(&argc, &argv, true);
-
-        auto tree = std::make_unique < RigidBodyTree < double >> ();
-        parsers::urdf::AddModelInstanceFromUrdfFile(GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
-                                                    multibody::joints::kRollPitchYaw, nullptr, tree.get());
 
         systems::DiagramBuilder<double> builder;
         auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
@@ -47,14 +50,28 @@ int do_main(int argc, char *argv[]) {
         //auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
         auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
 
-
         std::cout<<"LQR added"<< std::endl;
 
+        auto publisher = builder.AddSystem<lqr_demo_publisher<double>>();
+
+        /// ADD DRAKEVISUALIZER 
+        auto visualizer = builder.AddSystem<systems::DrakeVisualizer>(tree, &lcm);
+
+
+        std::cout<<"publisher added"<< std::endl;
 
         builder.Connect(quadrotor->get_output_port(0), controller->get_input_port());
         builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
+        builder.Connect(controller->get_output_port(), publisher->get_input_port());
+
+        /// CONNECT DRAKEVISUALIZER TO QUADROTOR OUTPUT
+        builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
+
+        std::cout<<"Diagram connected"<<std::endl;
 
         auto diagram = builder.Build();
+
+        std::cout<<"Diagram built"<<std::endl;
 
         systems::Simulator<double> simulator(*diagram);
         systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(

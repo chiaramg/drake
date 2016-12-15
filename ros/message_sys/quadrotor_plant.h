@@ -30,6 +30,10 @@ class QuadrotorPlant : public drake::systems::LeafSystem<T> {
   QuadrotorPlant(const double m, const double L, const drake::Matrix3<T> I,
                  const double kf, const double km);
 
+
+    /// The input force to this system is not direct feedthrough.
+    bool has_any_direct_feedthrough() const override { return false; }
+
   ~QuadrotorPlant() override;
 
   QuadrotorPlant<drake::AutoDiffXd>* DoToAutoDiffXd() const override;
@@ -48,9 +52,13 @@ class QuadrotorPlant : public drake::systems::LeafSystem<T> {
     context->get_mutable_continuous_state_vector()->SetFromVector(x);
   }
 
-    const double g_;
-    const double m_;
+   const double m() const {
+        return m_;
+    }
 
+   const double g() const {
+        return g_;
+    }
 
 protected:
   std::unique_ptr<drake::systems::ContinuousState<T>> AllocateContinuousState()
@@ -62,6 +70,9 @@ protected:
 
 
  private:
+
+  const double g_;
+  const double m_;
   const double L_;
   const Matrix3<T> I_;
   const double kf_;

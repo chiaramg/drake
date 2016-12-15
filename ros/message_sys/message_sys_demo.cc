@@ -39,7 +39,7 @@ int do_main(int argc, char *argv[]) {
 
 
   ///  WORKING DIAGRAM LINEAR SYSTEM-PUBLISHER
-/*
+
   Eigen::VectorXd vec = Eigen::VectorXd::Ones(12);
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
@@ -54,7 +54,7 @@ int do_main(int argc, char *argv[]) {
   builder.Connect(source->get_output_port(), linear_system->get_input_port());
   builder.Connect(linear_system->get_output_port(), publisher->get_input_port());
   //builder.Connect(publisher->get_output_port(), sink->get_input_port(0));
-*/
+
 
   ///  IN PROGRESS: SYSTEM WITH RECEIVER-TO-PUBLISHER
 /*
@@ -76,7 +76,7 @@ int do_main(int argc, char *argv[]) {
 
 */
   ///   IN PROGRESS: LQR
-
+/*
   //MatrixX<double> Q = MatrixX<double>::Identity(12,12);
   Eigen::MatrixXf Q = Eigen::MatrixXf::Identity(12, 12);
   //Q << Eigen::MatrixXf::Identity;
@@ -106,7 +106,7 @@ int do_main(int argc, char *argv[]) {
 //  builder.Connect(receiver->get_output_port(0), controller->get_input_port());
 //  builder.Connect(controller->get_output_port(),quad->get_input_port(0)); // u = -K*x
 //  builder.Connect(controller->get_output_port(0), publisher->get_input_port(0)); // K
-
+*/
 
   auto diagram = builder.Build();
 

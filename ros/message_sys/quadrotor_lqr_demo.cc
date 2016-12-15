@@ -23,56 +23,71 @@ using namespace drake;
 
 namespace ros {
 namespace message_sys{
-int do_main(int argc, char* argv[]){
-
-/*RigidBodyTree<double> tree(
-            GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
-            multibody::joints::kRollPitchYaw);
+namespace {
+/*
+    DEFINE_double(realtime_factor,
+    1.0,
+    " "
+    " ");
 */
-    auto tree = std::make_unique<RigidBodyTree<double>>();
-        parsers::urdf::AddModelInstanceFromUrdfFile(
-            GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
-            multibody::joints::kRollPitchYaw, nullptr, tree.get());
+int do_main(int argc, char *argv[]) {
 
 
-    //parsers::urdf::AddModelInstanceFromUrdfFileToWorld(
-    //        GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
-    //        multibody::joints::kRollPitchYaw, tree.get());
+       // gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  systems::DiagramBuilder<double> builder;
-  auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
+        auto tree = std::make_unique < RigidBodyTree < double >> ();
+        parsers::urdf::AddModelInstanceFromUrdfFile(GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
+                                                    multibody::joints::kRollPitchYaw, nullptr, tree.get());
 
-  //auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
-  auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
+        systems::DiagramBuilder<double> builder;
+        auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
 
-  builder.Connect(quadrotor->get_output_port(0), controller->get_input_port());
-  builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
+        std::cout<<"Qadrotor plant added"<< std::endl;
 
-  auto diagram = builder.Build();
+        //auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
+        auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
 
-  systems::Simulator<double> simulator(*diagram);
-  systems::Context<double>* quadrotor_context =
-            diagram->GetMutableSubsystemContext(simulator.get_mutable_context(),
-                                                quadrotor);
 
-    // set initial condition
-    //auto context = quadrotor->CreateDefaultContext();
+        std::cout<<"LQR added"<< std::endl;
 
-    //Eigen::VectorXf initial_state =
-      //          quadrotor_context->get_mutable_continuous_state_vector().CopyToVector();
-    //initial_state(2)=2.0;
 
-  simulator.Initialize();
+        builder.Connect(quadrotor->get_output_port(0), controller->get_input_port());
+        builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
 
-  simulator.StepTo(10);
+        auto diagram = builder.Build();
 
-  return 0;
+        systems::Simulator<double> simulator(*diagram);
+        systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(
+                simulator.get_mutable_context(), quadrotor);
 
+        // set initial condition
+        //auto context = quadrotor->CreateDefaultContext();
+
+        //Eigen::VectorXf initial_state =
+        //          quadrotor_context->get_mutable_continuous_state_vector().CopyToVector();
+        //initial_state(2)=2.0;
+
+        VectorX<double> x0 = VectorX<double>::Zero(12);
+        x0(1) = 0.9;
+        x0(2) = 1.0;
+        x0(3) = 1.0;
+
+        auto initial_context = quadrotor->CreateDefaultContext();
+        quadrotor->set_state(initial_context.get(), x0);
+
+
+        //simulator.set_target_realtime_rate(FLAGS_realtime_factor);
+
+        simulator.Initialize();
+
+        simulator.StepTo(10);
+
+        return 0;
 }
 
-
-}  // namespace quadLQR
-}  // namespace drake
+}
+}  // namespace message_sys
+}  // namespace ros
 
 int main(int argc, char* argv[]) {
     return ros::message_sys::do_main(argc, argv);

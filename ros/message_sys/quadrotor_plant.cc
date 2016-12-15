@@ -100,26 +100,28 @@ template class QuadrotorPlant<AutoDiffXd>;
 ///CHIARA::
     std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
             const QuadrotorPlant<double>* quad) {
-        auto context = quad->CreateDefaultContext();
+        //auto context = quad->CreateDefaultContext();
 
         // Set nominal torque to comp gravity...?
+        
+        auto quad_context_goal = quad->CreateDefaultContext();
 
+        // --> steady state hover input?
+        quad_context_goal->FixInputPort(0, Eigen::VectorXd::Zero(4));
 
-        //context->FixInputPort(0, Eigen::VectorXd::Zero(0));
+        Eigen::VectorXd x0 = Eigen::VectorXd::Zero(12);
+        x0(0) = 1.0;
+        x0(1) = 1.0;
+        x0(2) = 1.0;
 
-        // Set nominal state to the upright fixed point.
-        //AcrobotStateVector<double>* x = dynamic_cast<AcrobotStateVector<double>*>(
-        //        context->get_mutable_continuous_state_vector());
-        //DRAKE_ASSERT(x != nullptr);
+        Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);
 
-        // set goal state:
-        //Eigen::VectorXf* goal_state = Eigen::VectorXf::Zero(12);
-        //goal_state(2) += 1.0;
+        u0 *= quad->m_ * quad->g_ / 4;
 
-       // Eigen::Vector12f* goal_state = dynamic_cast<Eigen::Vector12f*>(
-         //       context->get_mutable_continuous_state_vector());
+        quad_context_goal->FixInputPort(0, u0);
+        quad->set_state(quad_context_goal.get(), x0);
 
-        //goal_state
+        //DRAKE_ASSERT(quad_context_goal != nullptr);
 
         // Setup LQR Cost matrices (penalize position error 10x more than velocity
         // to roughly address difference in units, using sqrt(g/l) as the time
@@ -132,7 +134,12 @@ template class QuadrotorPlant<AutoDiffXd>;
 
         Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
 
-        return drake::systems::LinearQuadraticRegulator(*quad, *context, Q, R);
+        std::cout << "set goalvector, Q & R inside StabilizingLQRController"<<std::endl;
+
+        //context->get_mutable_continuous_state()->SetFromVector(x0);
+
+        return drake::systems::LinearQuadraticRegulator(*quad, *quad_context_goal, Q, R);
+
     }
 
 

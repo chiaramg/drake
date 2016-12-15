@@ -48,16 +48,20 @@ class QuadrotorPlant : public drake::systems::LeafSystem<T> {
     context->get_mutable_continuous_state_vector()->SetFromVector(x);
   }
 
- protected:
+    const double g_;
+    const double m_;
+
+
+protected:
   std::unique_ptr<drake::systems::ContinuousState<T>> AllocateContinuousState()
       const override;
 
   std::unique_ptr<drake::systems::BasicVector<T>> AllocateOutputVector(
       const drake::systems::SystemPortDescriptor<T>& descriptor) const override;
 
+
+
  private:
-  const double g_;
-  const double m_;
   const double L_;
   const Matrix3<T> I_;
   const double kf_;

@@ -10,7 +10,7 @@
 #include "drake/systems/framework/leaf_system.h"
 #include "drake/util/drakeGeometryUtil.h"
 #include "drake/common/eigen_types.h"
-#include "drake/systems/framework/primitives/affine_system.h"
+#include "drake/systems/primitives/affine_system.h"
 
 
 using namespace drake;

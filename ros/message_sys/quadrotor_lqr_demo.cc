@@ -14,14 +14,14 @@
 #include "drake/common/text_logging.h"
 #include "drake/lcm/drake_lcm.h"
 #include "drake/multibody/parser_sdf.h"
-#include "drake/systems/framework/primitives/constant_vector_source.h"
+#include "drake/systems/primitives/constant_vector_source.h"
 #include "lqr_demo_publisher.h"
 
 #include "ros/ros.h"
 
 #include "quadrotor_plant.h"
 
-using namespace drake;
+//using namespace drake;
 
 namespace ros {
 namespace message_sys{
@@ -34,20 +34,29 @@ namespace {
 */
 int do_main(int argc, char *argv[]) {
 
-        lcm::DrakeLcm lcm;
+        ros::init(argc, argv, "LQR_demo");
 
-        RigidBodyTree<double> tree(
+
+        drake::lcm::DrakeLcm lcm;
+
+///acrobot:
+        auto tree = std::make_unique<RigidBodyTree<double>>();
+        parsers::urdf::AddModelInstanceFromUrdfFileToWorld(
+                GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
+                multibody::joints::kRollPitchYaw, tree.get());
+
+ ///PHILIP::
+    /*    RigidBodyTree<double> tree(
                 GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
                 multibody::joints::kRollPitchYaw);
-
+*/
        // gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-        systems::DiagramBuilder<double> builder;
+        drake::systems::DiagramBuilder<double> builder;
         auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
 
         std::cout<<"Qadrotor plant added"<< std::endl;
 
-        //auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
         auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
 
         std::cout<<"LQR added"<< std::endl;
@@ -55,7 +64,7 @@ int do_main(int argc, char *argv[]) {
         auto publisher = builder.AddSystem<lqr_demo_publisher<double>>();
 
         /// ADD DRAKEVISUALIZER 
-        auto visualizer = builder.AddSystem<systems::DrakeVisualizer>(tree, &lcm);
+        auto visualizer = builder.AddSystem<drake::systems::DrakeVisualizer>(*tree, &lcm);
 
 
         std::cout<<"publisher added"<< std::endl;
@@ -77,12 +86,7 @@ int do_main(int argc, char *argv[]) {
         systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(
                 simulator.get_mutable_context(), quadrotor);
 
-        // set initial condition
-        //auto context = quadrotor->CreateDefaultContext();
-
-        //Eigen::VectorXf initial_state =
-        //          quadrotor_context->get_mutable_continuous_state_vector().CopyToVector();
-        //initial_state(2)=2.0;
+        std::cout<<"define x0"<<std::endl;
 
         VectorX<double> x0 = VectorX<double>::Zero(12);
         x0(1) = 0.9;
@@ -92,10 +96,14 @@ int do_main(int argc, char *argv[]) {
         auto initial_context = quadrotor->CreateDefaultContext();
         quadrotor->set_state(initial_context.get(), x0);
 
-
         //simulator.set_target_realtime_rate(FLAGS_realtime_factor);
 
+        std::cout<<"initialize simulator:"<<std::endl;
+
         simulator.Initialize();
+
+        std::cout<<"simulator StepTo:"<<std::endl;
+
 
         simulator.StepTo(10);
 

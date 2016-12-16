@@ -63,14 +63,25 @@ namespace ros {
                 message_to_send.data.push_back(input_values(i));
             }
 
+
             std::cout<<input_values<<std::endl;
 
+            std::cout<<"about to start ROS node"<<std::endl;
+
             //ros::init(argc, argv, "publishVector");
+
             ros::NodeHandle nh;
+
+            std::cout<<"ROS node started"<<std::endl;
+
+
             //messages_chiara firstMessage(n); // firstMessage.sub, firstMessage.pub, firstMessage.firstCallback
             ros::Publisher chatter_pub = nh.advertise<std_msgs::Float32MultiArray>("chatter2", 100);
 
             ros::Rate loop_rate(10);
+
+            std::cout<<"publish a message"<<std::endl;
+
 
             while (ros::ok()) {
                 //firstMessage.pub.publish(message_to_send);

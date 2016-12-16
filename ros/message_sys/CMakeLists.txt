@@ -27,6 +27,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}	  
   ${CMAKE_INSTALL_PREFIX}/include
+  ${CMAKE_INSTALL_PREFIX}/include/lcmtypes
 )
 
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
@@ -43,14 +44,15 @@ target_link_libraries(message_sys_demo
   ${catkin_LIBRARIES}
   drakeCommon
   drakeSystemFramework
-  drakeSystemAnalysis)
+  drakeSystemAnalysis
+  drakeSystemPrimitives)
+
 
 add_executable(quadrotor_lqr_demo
         quadrotor_lqr_demo.cc
         quadrotor_plant.cc
         lqr_demo_publisher.cc)
 
-#target_link_libraries(message_sys message_sys.cpp)
 
 target_link_libraries(quadrotor_lqr_demo
         ${catkin_LIBRARIES}
@@ -60,15 +62,17 @@ target_link_libraries(quadrotor_lqr_demo
         drakeLinearControl
         drakeRigidBodyPlant
         drakeRBM
-        drakeLCMTypes
+        #drakeLCMTypes
+        drake_lcmtypes
         lcm
-        drakeLCMSystem2)
+        drakeLCMSystem2
+        drakeLcm
+        drakeSystemPrimitives)
 
 
 #add_library(message_sys message_sys.cpp)
 
-##drakeCommon
- ##drakeSystemFramework
+
 
 
 install(DIRECTORY include/${PROJECT_NAME}/

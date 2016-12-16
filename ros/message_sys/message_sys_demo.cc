@@ -9,9 +9,9 @@
 #include "drake/systems/framework/leaf_system.h"
 #include "drake/systems/framework/system_input.h"
 
-#include "drake/systems/framework/primitives/constant_vector_source.h"
-#include "drake/systems/framework/primitives/linear_system.h"
-#include "drake/systems/framework/primitives/zero_order_hold.h"
+#include "drake/systems/primitives/constant_vector_source.h"
+#include "drake/systems/primitives/linear_system.h"
+#include "drake/systems/primitives/zero_order_hold.h"
 
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.h"
 #include "RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.h"
@@ -112,7 +112,7 @@ int do_main(int argc, char *argv[]) {
 
   drake::systems::Simulator<double> simulator(*diagram);
 
-  diagram->SetDefaultState(simulator.get_mutable_context());
+  //diagram->SetDefaultState(simulator.get_mutable_context());
 
   simulator.Initialize();
 

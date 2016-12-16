@@ -70,9 +70,49 @@ target_link_libraries(quadrotor_lqr_demo
         drakeSystemPrimitives)
 
 
-#add_library(message_sys message_sys.cpp)
+add_executable(RPG_Drake_ROS_demo
+        RPG_Drake_ROS_demo.cpp
+        quadrotor_plant.cc
+        lqr_demo_publisher.cc
+        lqr_demo_subscriber.cpp
+        )
 
 
+
+
+target_link_libraries(RPG_Drake_ROS_demo
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRigidBodyPlant
+        drakeRBM
+        #drakeLCMTypes
+        drake_lcmtypes
+        lcm
+        drakeLCMSystem2
+        drakeLcm
+        drakeSystemPrimitives)
+
+
+
+#generate_messages(DEPENDENCIES std_msgs)
+
+add_executable(message_sys_send_drake_ros send_msg_demo.cpp)
+target_link_libraries(message_sys_send_drake_ros
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeSystemPrimitives)
+add_executable(message_sys_sub_drake_ros sub_msg_demo.cpp)
+target_link_libraries(message_sys_sub_drake_ros
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeSystemPrimitives)
 
 
 install(DIRECTORY include/${PROJECT_NAME}/

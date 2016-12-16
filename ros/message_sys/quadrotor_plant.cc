@@ -93,7 +93,7 @@ void QuadrotorPlant<T>::EvalTimeDerivatives(
   xdot << state.tail(6), xyz_ddot, rpy_ddot;
   derivatives->SetFromVector(xdot);
 }
-    
+
 template class QuadrotorPlant<double>;
 template class QuadrotorPlant<AutoDiffXd>;
 

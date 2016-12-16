@@ -1,7 +1,3 @@
-//
-// Created by chiara on 29.11.16.
-//
-
 
 #include "drake/systems/framework/diagram.h"
 #include "drake/systems/framework/diagram_builder.h"

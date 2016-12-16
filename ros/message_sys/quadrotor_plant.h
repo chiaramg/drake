@@ -52,6 +52,25 @@ class QuadrotorPlant : public drake::systems::LeafSystem<T> {
     context->get_mutable_continuous_state_vector()->SetFromVector(x);
   }
 
+  /// CHIARA
+/*
+    void SetDefaultState(const drake::systems::Context<T>& context,
+                         drake::systems::State<T>* state) const override {
+        DRAKE_DEMAND(state != nullptr);
+        drake::systems::Diagram<T>::SetDefaultState(context, state);
+        drake::systems::State<T>* plant_state =
+                this->GetMutableSubsystemState(state, plant_);
+        VectorX<T> x0(plant_->get_num_states());
+        x0.setZero();
+        // x0 is the initial state where
+         // x0(0), x0(1), x0(2) are the quadrotor's x, y, z -states
+         // x0(3), x0(4), x0(5) are the quedrotor's Euler angles phi, theta, psi
+         //
+        x0(2) = 0.2;  // setting arbitrary z-position
+        plant_->set_state_vector(plant_state, x0);
+    }
+*/
+
    const double m() const {
         return m_;
     }

@@ -93,55 +93,41 @@ void QuadrotorPlant<T>::EvalTimeDerivatives(
   xdot << state.tail(6), xyz_ddot, rpy_ddot;
   derivatives->SetFromVector(xdot);
 }
-    ///
+    
 template class QuadrotorPlant<double>;
 template class QuadrotorPlant<AutoDiffXd>;
 
-///CHIARA::
+
     std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
             const QuadrotorPlant<double>* quad) {
-        //auto context = quad->CreateDefaultContext();
-
-        // Set nominal torque to comp gravity...?
 
         auto quad_context_goal = quad->CreateDefaultContext();
 
-        // --> steady state hover input?
+        // --> steady state hover input
         quad_context_goal->FixInputPort(0, Eigen::VectorXd::Zero(4));
 
         Eigen::VectorXd x0 = Eigen::VectorXd::Zero(12);
         x0(0) = 1.0;
-        x0(1) = 1.0;
+        x0(1) = 2.0;
         x0(2) = 1.0;
 
         Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);
-
-        //const double m = quad->m();
 
         u0 *=  quad->m() * quad->g() / 4;
 
         quad_context_goal->FixInputPort(0, u0);
         quad->set_state(quad_context_goal.get(), x0);
 
-        //DRAKE_ASSERT(quad_context_goal != nullptr);
-
         // Setup LQR Cost matrices (penalize position error 10x more than velocity
         // to roughly address difference in units, using sqrt(g/l) as the time
         // constant.
 
         Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(12, 12);
-        //Q(0, 0) = 10;
-        //Q(1, 1) = 10;
         Q *= 10;
 
         Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
 
-        std::cout << "set goalvector, Q & R inside StabilizingLQRController"<<std::endl;
-
-        //context->get_mutable_continuous_state()->SetFromVector(x0);
-
         return drake::systems::LinearQuadraticRegulator(*quad, *quad_context_goal, Q, R);
-
     }
 
 

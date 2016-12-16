@@ -36,7 +36,6 @@ int do_main(int argc, char *argv[]) {
 
         ros::init(argc, argv, "LQR_demo");
 
-
         drake::lcm::DrakeLcm lcm;
 
 ///acrobot:
@@ -61,17 +60,15 @@ int do_main(int argc, char *argv[]) {
 
         std::cout<<"LQR added"<< std::endl;
 
-        auto publisher = builder.AddSystem<lqr_demo_publisher<double>>();
+ //       auto publisher = builder.AddSystem<lqr_demo_publisher<double>>();
 
         /// ADD DRAKEVISUALIZER 
         auto visualizer = builder.AddSystem<drake::systems::DrakeVisualizer>(*tree, &lcm);
 
-
-        std::cout<<"publisher added"<< std::endl;
-
         builder.Connect(quadrotor->get_output_port(0), controller->get_input_port());
         builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
-        builder.Connect(controller->get_output_port(), publisher->get_input_port());
+
+//        builder.Connect(controller->get_output_port(), publisher->get_input_port());
 
         /// CONNECT DRAKEVISUALIZER TO QUADROTOR OUTPUT
         builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
@@ -95,7 +92,7 @@ int do_main(int argc, char *argv[]) {
 
         auto initial_context = quadrotor->CreateDefaultContext();
         quadrotor->set_state(initial_context.get(), x0);
-
+        
         //simulator.set_target_realtime_rate(FLAGS_realtime_factor);
 
         std::cout<<"initialize simulator:"<<std::endl;

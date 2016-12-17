@@ -98,37 +98,38 @@ template class QuadrotorPlant<double>;
 template class QuadrotorPlant<AutoDiffXd>;
 
 
-    std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
+std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
             const QuadrotorPlant<double>* quad) {
 
-        auto quad_context_goal = quad->CreateDefaultContext();
+  auto quad_context_goal = quad->CreateDefaultContext();
 
         // --> steady state hover input
-        quad_context_goal->FixInputPort(0, Eigen::VectorXd::Zero(4));
+  quad_context_goal->FixInputPort(0, Eigen::VectorXd::Zero(4));
 
-        Eigen::VectorXd x0 = Eigen::VectorXd::Zero(12);
-        x0(0) = 1.0;
-        x0(1) = 2.0;
-        x0(2) = 1.0;
+  Eigen::VectorXd x0 = Eigen::VectorXd::Zero(12);
+  x0(0) = 1.0;
+  x0(1) = 2.0;
+  x0(2) = 1.0;
 
-        Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);
+  Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);
 
-        u0 *=  quad->m() * quad->g() / 4;
+  u0 *=  quad->m() * quad->g() / 4;
 
-        quad_context_goal->FixInputPort(0, u0);
-        quad->set_state(quad_context_goal.get(), x0);
+  quad_context_goal->FixInputPort(0, u0);
+  quad->set_state(quad_context_goal.get(), x0);
 
         // Setup LQR Cost matrices (penalize position error 10x more than velocity
         // to roughly address difference in units, using sqrt(g/l) as the time
         // constant.
 
-        Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(12, 12);
-        Q *= 10;
+  Eigen::MatrixXd Q = Eigen::MatrixXd::Identity(12, 12);
+  Q *= 10;
 
-        Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
+  Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
 
-        return drake::systems::LinearQuadraticRegulator(*quad, *quad_context_goal, Q, R);
-    }
+        ///hmmm.. only return D....
+  return drake::systems::LinearQuadraticRegulator(*quad, *quad_context_goal, Q, R);
+}
 
 
 

@@ -15,7 +15,7 @@
 #include "drake/lcm/drake_lcm.h"
 #include "drake/multibody/parser_sdf.h"
 #include "drake/systems/primitives/constant_vector_source.h"
-#include "lqr_demo_publisher.h"
+//#include "lqr_demo_publisher.h"
 
 #include "ros/ros.h"
 

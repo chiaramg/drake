@@ -7,6 +7,7 @@
 #include "drake/systems/framework/context.h"
 #include "drake/systems/framework/leaf_system.h"
 #include "drake/systems/framework/system_output.h"
+#include <ros/ros.h>
 
 
 namespace ros {
@@ -19,7 +20,7 @@ public:
   /// Constructs a system with a publisher to ROS
 
   //explicit RPG_quad_ROS_publisher();
-  lqr_demo_publisher();
+  lqr_demo_publisher(const ros::NodeHandle& nh, const std::string& node_name);
 
   ~lqr_demo_publisher() override;
 
@@ -27,13 +28,16 @@ public:
 
   void DoPublish(const drake::systems::Context<T>& context) const override;
 
+
   void EvalOutput(const drake::systems::Context <T> &context,
-                        drake::systems::SystemOutput <T> *output) const override;
+                    drake::systems::SystemOutput <T> *output) const override;
 
   // Returns the input port
   const drake::systems::SystemPortDescriptor <T> &get_input_port() const;
-  /// Returns the output port
-  const drake::systems::SystemPortDescriptor <T> &get_output_port() const;
+
+private:
+    ros::Publisher send_to_ros_;
+    ros::NodeHandle nh_;
 };
 
 }   // namespace message_sys

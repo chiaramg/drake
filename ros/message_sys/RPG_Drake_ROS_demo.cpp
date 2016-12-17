@@ -32,6 +32,8 @@ int do_main(int argc, char *argv[]) {
 
   ros::init(argc, argv, "Drake_ROS_LQR_demo");
 
+  ros::NodeHandle n;
+
   drake::lcm::DrakeLcm lcm;
 
   auto tree = std::make_unique<RigidBodyTree<double>>();
@@ -41,14 +43,14 @@ int do_main(int argc, char *argv[]) {
 
   drake::systems::DiagramBuilder<double> builder;
 
-  Eigen::VectorXd vec = Eigen::VectorXd::Ones(1);
+  Eigen::VectorXd vec = Eigen::VectorXd::Ones(12);
 
 
     /// -------------------- ADDING THE SYSTEMS --------------------------///
 
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
-  auto subscriber = builder.AddSystem<RPG_quad_ROS_subscriber<double>>();
+  auto subscriber = builder.AddSystem<RPG_quad_ROS_subscriber<double>>(n, "chatter1");
 
   auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
 
@@ -56,26 +58,26 @@ int do_main(int argc, char *argv[]) {
 
   auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
 
-  auto publisher = builder.AddSystem<lqr_demo_publisher<double>>();
+  //auto publisher = builder.AddSystem<lqr_demo_publisher<double>>(n, "chatter2");
 
 
     /// -------------------- CONNECTING THE DIAGRAM --------------------------///
 
-  builder.Connect(source->get_output_port(), subscriber->get_input_port());
-
   builder.Connect(subscriber->get_output_port(), controller->get_input_port());
+
+  //  builder.Connect(source->get_output_port(), controller->get_input_port());
 
   builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
 
   builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
 
-  builder.Connect(controller->get_output_port(), publisher->get_input_port());
+ // builder.Connect(controller->get_output_port(), publisher->get_input_port());
 
   //builder.Connect(controller->get_output_port(), publisher->get_input_port(0));
   //builder.Connect(subscriber->get_output_port(), publisher->get_input_port(1));
 
 
-  auto diagram = builder.Build();
+    auto diagram = builder.Build();
 
     std::cout<<"diagram built"<<std::endl;
 
@@ -83,7 +85,6 @@ int do_main(int argc, char *argv[]) {
 
   VectorX<double> x0 = VectorX<double>::Zero(12);
 
-  for(int i = 0; i<10; i++){
     auto diagram_context = diagram->CreateDefaultContext();
     systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(
         simulator.get_mutable_context(), quadrotor);
@@ -98,9 +99,7 @@ int do_main(int argc, char *argv[]) {
 
       std::cout<<"about to stepTo"<<std::endl;
 
-    simulator.StepTo(4);
-    simulator.reset_context(std::move(diagram_context));
-  }
+    simulator.StepTo(10.0);
 
   return 0;
 }

@@ -4,32 +4,6 @@
 
 #include <ros/ros.h>
 
-/*
-messages_chiara::messages_chiara(ros::NodeHandle& nh_)
-
-{
-    //SUBSCRIBERS
-    sub = nh_.subscribe("chat2", 100, &messages_chiara::firstCallback,this);
-
-    //PUBLISHERS
-    pub = nh_.advertise<std_msgs::Float32MultiArray>("chatter1", 100);
-
-}
-*/
-/*
-messages_chiara::~messages_chiara(){}
-
-void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array)
-{
-    std::cout << "This is the initial talker, Message received" << std::endl;
-
-    std::vector<float> temp = my_array->data;
-
-    Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 6, 5);
-
-    std::cout << my_mat << std::endl;
-
-}*/
 
 
 int main(int argc, char **argv) {
@@ -38,7 +12,6 @@ int main(int argc, char **argv) {
 
     ros::NodeHandle n;
 
-//    messages_chiara firstMessage(n);  // firstMessage.sub, firstMessage.pub, firstMessage::firstCallback
     ros::Publisher pub;
     pub = n.advertise<std_msgs::Float32MultiArray>("chatter1", 100);
     ros::Rate loop_rate(10);
@@ -53,13 +26,14 @@ int main(int argc, char **argv) {
 
     std_msgs::Float32MultiArray my_array;
 
-    my_array.data.clear();
-
-    for (int i = 0; i < 12; i++) {
-            my_array.data.push_back(vec(i));
-    }
-
+    long double ctr = -1;
     while (ros::ok()) {
+
+        my_array.data.clear();
+        for (int i = 0; i < 12; i++) {
+           vec(i) += ++ctr;
+            my_array.data.push_back(vec(i));
+        }
 
         //firstMessage.pub.publish(my_array);
         pub.publish(my_array);

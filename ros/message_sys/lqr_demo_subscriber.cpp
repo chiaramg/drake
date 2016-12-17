@@ -11,66 +11,42 @@
 
 namespace ros {
 namespace message_sys {
-/*
-messages_chiara::messages_chiara(ros::NodeHandle& nh_){
-
-sub = nh_.subscribe("chatter1", 1, &messages_chiara::firstCallback,this);
-
-std::cout << "subscribed to Chatter1" << std::endl;
-}
-
-messages_chiara::~messages_chiara(){}*/
 
 template<typename T>
-RPG_quad_ROS_subscriber<T>::RPG_quad_ROS_subscriber(ros::Nodehandle nh_) {
-            //this->DeclareInputPort(drake::systems::kVectorValued, 1);
-            //this->DeclareOutputPort(drake::systems::kVectorValued, 1);
-      this->DeclareInputPort(drake::systems::kVectorValued, 1);
+RPG_quad_ROS_subscriber<T>::RPG_quad_ROS_subscriber(const ros::NodeHandle& nh, const std::string& node_name) :
+        nh_(nh), received_message_(Eigen::VectorXd::Zero(12)) {
+
       this->DeclareOutputPort(drake::systems::kVectorValued, 12);
-      sub_to_ros_ = nh_.subscribe("chatter1", 100, &RPG_quad_ROS_subscriber::firstCallback, this);
+      std::cout<<"Subscriber create"<<std::endl;
+     sub_to_ros_ = nh_.subscribe(
+             node_name, 100, &RPG_quad_ROS_subscriber<T>::TopicCallback, this);
 }
 
 template<typename T>
 RPG_quad_ROS_subscriber<T>::~RPG_quad_ROS_subscriber() {}
 
 template<typename T>
-const drake::systems::SystemPortDescriptor <T> &
-RPG_quad_ROS_subscriber<T>::get_input_port() const {
-  return drake::systems::System<T>::get_input_port(0);
-}
-
-template<typename T>
-const drake::systems::SystemPortDescriptor <T> &
+const drake::systems::SystemPortDescriptor<T>&
 RPG_quad_ROS_subscriber<T>::get_output_port() const {
   return drake::systems::System<T>::get_output_port(0);
 }
 
-//void messages_chiara::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array)//,
-  //const drake::systems::Context<double> &context,
-  //drake::systems::SystemOutput<double> *output)
 template<typename T>
-void RPG_quad_ROS_subscriber<T>::firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array) {
-      //void firstCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array) {
+void RPG_quad_ROS_subscriber<T>::TopicCallback(
+        const std_msgs::Float32MultiArray::ConstPtr& my_array)  {
 
-  std::cout << "This is the listener inside Drake, receiving message" << std::endl;
+  std::cout << "This is the listener inside Drake, receiving message chiara rocks!" << std::endl;
 
-  std::vector<float> temp = my_array->data;
+    std::vector<float> temp = my_array->data;
 
-  //this->received_message = my_array->received_message;
-  //Eigen::MatrixXf my_mat = Eigen::Map<Eigen::MatrixXf> (temp.data(), 12, 1);
-
-  //    RPG_quad_ROS_subscriber<T>::key_.lock();
-  Eigen::VectorXf received_message_ = Eigen::Map<Eigen::VectorXf> (temp.data(), 12);
+   key_.lock();
+   Eigen::VectorXf received_message_ = Eigen::Map<Eigen::VectorXf> (temp.data(), 12);
    //   RPG_quad_ROS_subscriber<T>::key_.unlock();
+  key_.unlock();
 
+    std::cout<<received_message_<<std::endl;
 
-  //received_message = my_mat;
-  //drake::systems::BasicVector<double>* output_vector = output->GetMutableVectorData(0);
-  //auto y = output_vector->get_mutable_value();
-
-
-
-  std::cout << received_message_ << std::endl;
+// std::cout << received_message_ << std::endl;
 }
 
 template<typename T>
@@ -81,36 +57,76 @@ void RPG_quad_ROS_subscriber<T>::EvalOutput(const drake::systems::Context <T> &c
 
   drake::systems::BasicVector<T>* output_vector = output->GetMutableVectorData(0);
 
-  std::cout << "BasicVector<T> output_vector" << std::endl;
+  //ros::spinOnce()
+// std::cout << "In EvalOutput of the subscriber printing : " <<received_message_<< std::endl;
 
-  //RPG_quad_ROS_subscriber<T>::key_.lock();
-  output_vector->get_mutable_value() = received_message_;
+  // key_.lock();
+///    std::vector<float> temp = received_message_;
+    /*
+    for(int i=0; i<12; i++){
+     temp.push_back(received_message_(i));
+    }*/
+  //  key_.unlock();
+
+    ///
+/*    std::vector<float> temp;
+
+    //temp.data.clear();
+
+    for (int i = 0; i < 12; i++) {
+        temp.push_back(received_message_(i));
+    }
+*/
+///
+    //Eigen::VectorXf test = Eigen::VectorXf::Ones(12);
+
+    //key_.lock();
+    //Eigen::VectorXf vec = received_message_;
+  //  key_.unlock();
+
+///    Eigen::VectorXf vec = Eigen::Map<Eigen::VectorXf> (temp.data(), 12);
+    //RPG_quad_ROS_subscriber<T>::key_.lock();
+
+
+    auto y = output_vector->get_mutable_value();
+    key_.lock();
+    y = received_message_;
+    key_.unlock();
+
+
+//  output_vector->get_mutable_value() = test;
+
   //RPG_quad_ROS_subscriber<T>::key_.unlock();
 
 }
 
+
 template<typename T>
-void RPG_quad_ROS_subscriber<T>::DoPublish(const drake::systems::Context<T>& context) const {
+void RPG_quad_ROS_subscriber<T>::DoPublish(
+        const drake::systems::Context<T>& context) const {
             //DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidOutput(output));
+/*
   DRAKE_ASSERT_VOID(drake::systems::System<T>::CheckValidContext(context));
 
-  std::cout << "In the receiver" << std::endl;
+  std::cout << "In the DoPublish of the receiver" << std::endl;
 
-  ros::NodeHandle n;
+  //RPG_quad_ROS_subscriber subscribe_to_ros;
 
-  std::cout << "NodeHandle created in the receiver" << std::endl;
+  //ros::NodeHandle n;
+
+  //std::cout << "NodeHandle created in the receiver" << std::endl;
 
   //ros::Subscriber sub = n.subscribe("chatter", 100, firstCallback);
   //messages_chiara ObstacleMessage(n);
   //std::cout << "obstacle of class messages_chiara created" << std::endl;
 
-  ros::Subscriber sub;
+  //ros::Subscriber sub;
 
  // sub = n.subscribe("chatter1", 100, firstCallback, this);
-  sub = n.subscribe("chatter1", 100, firstCallback);
+  //sub = n.subscribe("chatter1", 100, firstCallback);
 
 
-  std::cout << "subscribed to Chatter1" << std::endl;
+  //std::cout << "subscribed to Chatter1" << std::endl;
 
             //std::cout<<ObstacleMessage.received_message<<std::endl;
             // put received_message into outputport of the receiver!!
@@ -120,8 +136,8 @@ void RPG_quad_ROS_subscriber<T>::DoPublish(const drake::systems::Context<T>& con
             //std_msgs::Float32MultiArray* my_array;
             //messages_chiara::firstCallback(&my_array);
             //System<T>::GetMutableOutputVector(output, 0) = ; //received message
-
-  ros::spin();
+*/
+    ros::spinOnce();
 }
 
 template class RPG_quad_ROS_subscriber<double>;

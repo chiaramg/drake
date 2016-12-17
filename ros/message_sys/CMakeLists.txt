@@ -52,8 +52,6 @@ add_executable(quadrotor_lqr_demo
         quadrotor_lqr_demo.cc
         quadrotor_plant.cc
         lqr_demo_publisher.cc)
-
-
 target_link_libraries(quadrotor_lqr_demo
         ${catkin_LIBRARIES}
         drakeCommon
@@ -76,10 +74,6 @@ add_executable(RPG_Drake_ROS_demo
         lqr_demo_publisher.cc
         lqr_demo_subscriber.cpp
         )
-
-
-
-
 target_link_libraries(RPG_Drake_ROS_demo
         ${catkin_LIBRARIES}
         drakeCommon

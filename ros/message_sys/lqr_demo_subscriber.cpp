@@ -13,13 +13,17 @@ namespace ros {
 namespace message_sys {
 
 template<typename T>
-RPG_quad_ROS_subscriber<T>::RPG_quad_ROS_subscriber(const ros::NodeHandle& nh, const std::string& node_name) :
-        nh_(nh), received_message_(Eigen::VectorXd::Zero(12)) {
+RPG_quad_ROS_subscriber<T>::RPG_quad_ROS_subscriber(
+        const ros::NodeHandle& nh,
+        const std::string& node_name, const int& data_dimension) :
+        nh_(nh),
+        data_dimension_(data_dimension),
+        received_message_(Eigen::VectorXd::Zero(data_dimension)) {
 
-      this->DeclareOutputPort(drake::systems::kVectorValued, 12);
-      std::cout<<"Subscriber create"<<std::endl;
+      this->DeclareOutputPort(drake::systems::kVectorValued, data_dimension);
      sub_to_ros_ = nh_.subscribe(
              node_name, 100, &RPG_quad_ROS_subscriber<T>::TopicCallback, this);
+
 }
 
 template<typename T>
@@ -40,7 +44,7 @@ void RPG_quad_ROS_subscriber<T>::TopicCallback(
     std::vector<float> temp = my_array->data;
 
    key_.lock();
-   Eigen::VectorXf received_message_ = Eigen::Map<Eigen::VectorXf> (temp.data(), 12);
+   Eigen::VectorXf received_message_ = Eigen::Map<Eigen::VectorXf> (temp.data(), data_dimension_);
    //   RPG_quad_ROS_subscriber<T>::key_.unlock();
   key_.unlock();
 

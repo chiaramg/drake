@@ -17,7 +17,7 @@ class RPG_quad_ROS_subscriber : public drake::systems::LeafSystem<T> {
 public:
 /// Constructs a system with a publisher to ROS
 
-RPG_quad_ROS_subscriber(const ros::NodeHandle& nh, const std::string& node_name);
+RPG_quad_ROS_subscriber(const ros::NodeHandle& nh, const std::string& node_name, const int& data_dimension);
 ~RPG_quad_ROS_subscriber() override;
 
 
@@ -39,6 +39,8 @@ private:
      mutable std::mutex key_;
      ros::NodeHandle nh_;
      ros::Subscriber sub_to_ros_;
+
+     const int data_dimension_;
 
 };
 

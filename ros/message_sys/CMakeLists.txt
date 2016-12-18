@@ -109,6 +109,62 @@ target_link_libraries(message_sys_sub_drake_ros
         drakeSystemPrimitives)
 
 
+add_executable(send_drake_to_ros
+        Drake_to_ros.cpp
+        drake_to_ros_publisher.cpp)
+
+target_link_libraries(send_drake_to_ros
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRBM
+        drakeSystemPrimitives)
+
+add_executable(quad_controller
+        quad_controller.cpp
+        lqr_demo_subscriber.cpp
+        lqr_demo_publisher.cc
+        quadrotor_plant.cc)
+target_link_libraries(quad_controller
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRigidBodyPlant
+        drakeRBM
+        #drakeLCMTypes
+        drake_lcmtypes
+        lcm
+        drakeLCMSystem2
+        drakeLcm
+        drakeSystemPrimitives)
+
+add_executable(quad_simulator
+        quad_simulator.cpp
+        lqr_demo_subscriber.cpp
+        lqr_demo_publisher.cc
+        quadrotor_plant.cc)
+target_link_libraries(quad_simulator
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRigidBodyPlant
+        drakeRBM
+        #drakeLCMTypes
+        drake_lcmtypes
+        lcm
+        drakeLCMSystem2
+        drakeLcm
+        drakeSystemPrimitives)
+
+
+
+
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         FILES_MATCHING PATTERN "*.h")

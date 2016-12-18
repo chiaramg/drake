@@ -107,8 +107,8 @@ std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
   quad_context_goal->FixInputPort(0, Eigen::VectorXd::Zero(4));
 
   Eigen::VectorXd x0 = Eigen::VectorXd::Zero(12);
-  x0(0) = 1.0;
-  x0(1) = 2.0;
+  x0(0) = 0.0;
+  x0(1) = 0.0;
   x0(2) = 1.0;
 
   Eigen::VectorXd u0 = Eigen::VectorXd::Ones(4);

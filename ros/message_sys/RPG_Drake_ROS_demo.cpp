@@ -50,7 +50,7 @@ int do_main(int argc, char *argv[]) {
 
   auto source = builder.AddSystem<drake::systems::ConstantVectorSource<double>>(vec);
 
-  auto subscriber = builder.AddSystem<RPG_quad_ROS_subscriber<double>>(n, "chatter1");
+  auto subscriber = builder.AddSystem<RPG_quad_ROS_subscriber<double>>(n, "chatter1", 12);
 
   auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
 
@@ -58,7 +58,13 @@ int do_main(int argc, char *argv[]) {
 
   auto controller = builder.AddSystem(StabilizingLQRController(quadrotor));
 
-  //auto publisher = builder.AddSystem<lqr_demo_publisher<double>>(n, "chatter2");
+
+  std::cout<<"Controller properties : A"<<controller->A()<<"\n";
+  std::cout<<"Controller properties : B"<<controller->B()<<"\n";
+  std::cout<<"Controller properties : C"<<controller->C()<<"\n";
+  std::cout<<"Controller properties : D"<<controller->D()<<"\n";
+  ////
+  auto publisher = builder.AddSystem<lqr_demo_publisher<double>>(n, "chatter2", 4);
 
 
     /// -------------------- CONNECTING THE DIAGRAM --------------------------///
@@ -71,7 +77,7 @@ int do_main(int argc, char *argv[]) {
 
   builder.Connect(controller->get_output_port(), quadrotor->get_input_port(0));
 
- // builder.Connect(controller->get_output_port(), publisher->get_input_port());
+  builder.Connect(controller->get_output_port(), publisher->get_input_port());
 
   //builder.Connect(controller->get_output_port(), publisher->get_input_port(0));
   //builder.Connect(subscriber->get_output_port(), publisher->get_input_port(1));
@@ -99,7 +105,8 @@ int do_main(int argc, char *argv[]) {
 
       std::cout<<"about to stepTo"<<std::endl;
 
-    simulator.StepTo(10.0);
+    simulator.set_target_realtime_rate(1.0);
+    simulator.StepTo(0.5);
 
   return 0;
 }

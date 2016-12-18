@@ -14,9 +14,16 @@ namespace message_sys {
 
 template<typename T>
 lqr_demo_publisher<T>::lqr_demo_publisher(const ros::NodeHandle& nh,
-                                          const std::string& node_name) : nh_(nh) {
-  this->DeclareInputPort(drake::systems::kVectorValued, 4);
+                                          const std::string& node_name,
+                                          const int& data_dimension)
+                                : nh_(nh),
+                                  data_dimension_(data_dimension){
+  //this->DeclareInputPort(drake::systems::kVectorValued, 4);
+  this->DeclareInputPort(drake::systems::kVectorValued, data_dimension_);
+  this->DeclareOutputPort(drake::systems::kVectorValued, 1);
+
   send_to_ros_ = nh_.advertise<std_msgs::Float32MultiArray>(node_name, 100);
+
 }
 
 template<typename T>
@@ -43,17 +50,15 @@ void lqr_demo_publisher<T>::DoPublish(const drake::systems::Context<T>& context)
 
   //const auto& input_values = input->get_value();
 
-
-
- Eigen::VectorXd input_values = input->get_value();
-
   std_msgs::Float32MultiArray message_to_send;
+  Eigen::VectorXd input_values = input->get_value();
 
-  message_to_send.data.clear();
-  int numbers_input = input_values.rows();
+  //message_to_send_.data.clear();
+  //int numbers_input = input_values.rows();
 
-  for (int i =0; i<numbers_input; i++){
+  for (int i =0; i<data_dimension_; i++){
     message_to_send.data.push_back(input_values(i));
+    //message_to_send_.data(i) = input_values(i);
   }
 
   send_to_ros_.publish(message_to_send);

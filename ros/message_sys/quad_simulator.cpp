@@ -15,7 +15,6 @@
 #include "drake/lcm/drake_lcm.h"
 #include "drake/multibody/parser_sdf.h"
 #include "drake/systems/primitives/constant_vector_source.h"
-#include "lqr_demo_publisher.h"
 
 #include "ros/ros.h"
 
@@ -30,17 +29,23 @@ namespace {
 
 int do_main(int argc, char *argv[]) {
 
-  ros::init(argc, argv, "Drake_ROS_LQR_demo");
+  ros::init(argc, argv, "Quad_Simulator");
 
   ros::NodeHandle n;
-/*
+
+  /// ADD FOR VISUALIZATION:
+
+
   drake::lcm::DrakeLcm lcm;
 
   auto tree = std::make_unique<RigidBodyTree<double>>();
   parsers::urdf::AddModelInstanceFromUrdfFileToWorld(
                  GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
                         multibody::joints::kRollPitchYaw, tree.get());
-*/
+
+
+  ///
+
   drake::systems::DiagramBuilder<double> builder;
 
 
@@ -52,12 +57,14 @@ int do_main(int argc, char *argv[]) {
 
   auto publisher = builder.AddSystem<lqr_demo_publisher<double>>(n, "controller_in", 12);
 
+  auto visualizer = builder.AddSystem<drake::systems::DrakeVisualizer>(*tree, &lcm);
+
 
   /// -------------------- CONNECTING THE DIAGRAM --------------------------///
 
   builder.Connect(subscriber->get_output_port(), quadrotor->get_input_port(0));
 
-  //builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
+  builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
 
   builder.Connect(quadrotor->get_output_port(0), publisher->get_input_port());
 
@@ -70,6 +77,27 @@ int do_main(int argc, char *argv[]) {
 
   systems::Simulator<double> simulator(*diagram);
 
+/// ADD FOR VISUALIZATION PURPOSES
+
+  VectorX<double> x0 = VectorX<double>::Zero(12);
+
+
+  for(int i = 0; i<10; i++){
+
+    auto diagram_context = diagram->CreateDefaultContext();
+    systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(
+            simulator.get_mutable_context(), quadrotor);
+    x0 = VectorX<double>::Random(12);
+
+    simulator.get_mutable_context()->get_mutable_continuous_state_vector()->SetFromVector(x0);
+
+    simulator.Initialize();
+
+    simulator.StepTo(4);
+    simulator.reset_context(std::move(diagram_context));
+  }
+
+///
 /*
   VectorX<double> x0 = VectorX<double>::Zero(12);
 
@@ -82,6 +110,8 @@ int do_main(int argc, char *argv[]) {
   simulator.get_mutable_context()->get_mutable_continuous_state_vector()->SetFromVector(x0);
 */
 
+/// COMMENT FOR VISUALIZATION PURPOSES:
+/*
   std::cout<<"about to initialize the simulator"<<std::endl;
 
   simulator.Initialize();
@@ -89,7 +119,9 @@ int do_main(int argc, char *argv[]) {
   std::cout<<"about to stepTo"<<std::endl;
 
   simulator.StepTo(25.0);
+*/
 
+///
   return 0;
 }
 

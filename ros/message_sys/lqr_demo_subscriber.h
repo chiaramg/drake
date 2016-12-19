@@ -21,7 +21,7 @@ RPG_quad_ROS_subscriber(const ros::NodeHandle& nh, const std::string& node_name,
 ~RPG_quad_ROS_subscriber() override;
 
 
-void TopicCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array) ;
+void TopicCallback(const std_msgs::Float32MultiArray::ConstPtr& my_array) const ;
 
 void DoPublish(const drake::systems::Context<T>& context) const override;
 
@@ -39,7 +39,7 @@ private:
      mutable std::mutex key_;
      ros::NodeHandle nh_;
      ros::Subscriber sub_to_ros_;
-
+     ros::AsyncSpinner spinner{2};
      const int data_dimension_;
 
 };

@@ -34,6 +34,8 @@ public:
 
   // Returns the input port
   const drake::systems::SystemPortDescriptor <T> &get_input_port() const;
+    const drake::systems::SystemPortDescriptor <T> &get_output_port() const;
+
 
 private:
     ros::Publisher send_to_ros_;

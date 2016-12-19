@@ -32,20 +32,18 @@ include_directories(
 
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
-add_executable(message_sys_demo
-        message_sys_demo.cc
-        msgs_chiara.cc
-        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
-        RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
+#add_executable(message_sys_demo
+ #       message_sys_demo.cc
+        #msgs_chiara.cc
+  #      RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
+   #     RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
 
-#target_link_libraries(message_sys message_sys.cpp)
-
-target_link_libraries(message_sys_demo
-  ${catkin_LIBRARIES}
-  drakeCommon
-  drakeSystemFramework
-  drakeSystemAnalysis
-  drakeSystemPrimitives)
+#target_link_libraries(message_sys_demo
+ # ${catkin_LIBRARIES}
+  #drakeCommon
+  #drakeSystemFramework
+  #drakeSystemAnalysis
+  #drakeSystemPrimitives)
 
 
 add_executable(quadrotor_lqr_demo
@@ -109,18 +107,18 @@ target_link_libraries(message_sys_sub_drake_ros
         drakeSystemPrimitives)
 
 
-add_executable(send_drake_to_ros
-        Drake_to_ros.cpp
-        drake_to_ros_publisher.cpp)
+#add_executable(send_drake_to_ros
+ #       Drake_to_ros.cpp
+  #      drake_to_ros_publisher.cpp)
 
-target_link_libraries(send_drake_to_ros
-        ${catkin_LIBRARIES}
-        drakeCommon
-        drakeSystemFramework
-        drakeSystemAnalysis
-        drakeLinearControl
-        drakeRBM
-        drakeSystemPrimitives)
+#target_link_libraries(send_drake_to_ros
+ #       ${catkin_LIBRARIES}
+  #      drakeCommon
+   #     drakeSystemFramework
+    #    drakeSystemAnalysis
+     #   drakeLinearControl
+      #  drakeRBM
+       # drakeSystemPrimitives)
 
 add_executable(quad_controller
         quad_controller.cpp

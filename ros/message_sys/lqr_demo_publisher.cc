@@ -35,6 +35,13 @@ const drake::systems::SystemPortDescriptor <T> &
   return drake::systems::System<T>::get_input_port(0);
 }
 
+    template<typename T>
+    const drake::systems::SystemPortDescriptor <T> &
+    lqr_demo_publisher<T>::get_output_port() const {
+        return drake::systems::System<T>::get_output_port(0);
+    }
+
+
 template <typename T>
 void lqr_demo_publisher<T>::EvalOutput(const drake::systems::Context <T> &context,
                                        drake::systems::SystemOutput <T> *output) const {
@@ -60,6 +67,8 @@ void lqr_demo_publisher<T>::DoPublish(const drake::systems::Context<T>& context)
     message_to_send.data.push_back(input_values(i));
     //message_to_send_.data(i) = input_values(i);
   }
+
+//  std::cout<<"I send: "<<input_values<<std::endl;
 
   send_to_ros_.publish(message_to_send);
 

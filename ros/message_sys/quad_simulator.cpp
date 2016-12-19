@@ -43,45 +43,27 @@ int do_main(int argc, char *argv[]) {
                  GetDrakePath() + "/examples/Quadrotor/quadrotor.urdf",
                         multibody::joints::kRollPitchYaw, tree.get());
 
-
-  ///
-
   drake::systems::DiagramBuilder<double> builder;
 
-
-  /// -------------------- ADDING THE SYSTEMS --------------------------///
+  // -------------------- ADDING THE SYSTEMS --------------------------///
 
   auto subscriber = builder.AddSystem<RPG_quad_ROS_subscriber<double>>(n, "controller_out", 4);
-
   auto quadrotor = builder.AddSystem<QuadrotorPlant<double>>();
-
   auto publisher = builder.AddSystem<lqr_demo_publisher<double>>(n, "controller_in", 12);
-
   auto visualizer = builder.AddSystem<drake::systems::DrakeVisualizer>(*tree, &lcm);
 
-
-  /// -------------------- CONNECTING THE DIAGRAM --------------------------///
+ // -------------------- CONNECTING THE DIAGRAM --------------------------///
 
   builder.Connect(subscriber->get_output_port(), quadrotor->get_input_port(0));
-
   builder.Connect(quadrotor->get_output_port(0), visualizer->get_input_port(0));
-
   builder.Connect(quadrotor->get_output_port(0), publisher->get_input_port());
 
-  //builder.Connect(controller->get_output_port(), publisher->get_input_port(0));
-  //builder.Connect(subscriber->get_output_port(), publisher->get_input_port(1));
-
   auto diagram = builder.Build();
-
-  std::cout<<"diagram built"<<std::endl;
-
   systems::Simulator<double> simulator(*diagram);
 
 /// ADD FOR VISUALIZATION PURPOSES
 
   VectorX<double> x0 = VectorX<double>::Zero(12);
-
-
   for(int i = 0; i<10; i++){
 
     auto diagram_context = diagram->CreateDefaultContext();
@@ -96,32 +78,6 @@ int do_main(int argc, char *argv[]) {
     simulator.StepTo(4);
     simulator.reset_context(std::move(diagram_context));
   }
-
-///
-/*
-  VectorX<double> x0 = VectorX<double>::Zero(12);
-
-  auto diagram_context = diagram->CreateDefaultContext();
-  systems::Context<double> *quadrotor_context = diagram->GetMutableSubsystemContext(
-             simulator.get_mutable_context(), quadrotor);
-
-  x0 = VectorX<double>::Random(12);
-
-  simulator.get_mutable_context()->get_mutable_continuous_state_vector()->SetFromVector(x0);
-*/
-
-/// COMMENT FOR VISUALIZATION PURPOSES:
-/*
-  std::cout<<"about to initialize the simulator"<<std::endl;
-
-  simulator.Initialize();
-
-  std::cout<<"about to stepTo"<<std::endl;
-
-  simulator.StepTo(25.0);
-*/
-
-///
   return 0;
 }
 

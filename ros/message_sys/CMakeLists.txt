@@ -11,12 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
 set(EIGEN3_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include/eigen3)
 set(EIGEN3_FOUND true)
 
-#CHIARA EDITED 04.12
-#catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES ${PROJECT_NAME}
-#  CATKIN_DEPENDS
-#)
 
 catkin_package()
 
@@ -32,18 +26,6 @@ include_directories(
 
 link_directories("${CMAKE_INSTALL_PREFIX}/lib")
 
-#add_executable(message_sys_demo
- #       message_sys_demo.cc
-        #msgs_chiara.cc
-  #      RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Publisher.cc
-   #     RPG_Drake_ROS_Bridge/RPG_Quad_ROS_Receiver.cc)
-
-#target_link_libraries(message_sys_demo
- # ${catkin_LIBRARIES}
-  #drakeCommon
-  #drakeSystemFramework
-  #drakeSystemAnalysis
-  #drakeSystemPrimitives)
 
 
 add_executable(quadrotor_lqr_demo
@@ -58,7 +40,6 @@ target_link_libraries(quadrotor_lqr_demo
         drakeLinearControl
         drakeRigidBodyPlant
         drakeRBM
-        #drakeLCMTypes
         drake_lcmtypes
         lcm
         drakeLCMSystem2
@@ -80,16 +61,12 @@ target_link_libraries(RPG_Drake_ROS_demo
         drakeLinearControl
         drakeRigidBodyPlant
         drakeRBM
-        #drakeLCMTypes
         drake_lcmtypes
         lcm
         drakeLCMSystem2
         drakeLcm
         drakeSystemPrimitives)
 
-
-
-#generate_messages(DEPENDENCIES std_msgs)
 
 add_executable(message_sys_send_drake_ros send_msg_demo.cpp)
 target_link_libraries(message_sys_send_drake_ros
@@ -107,24 +84,12 @@ target_link_libraries(message_sys_sub_drake_ros
         drakeSystemPrimitives)
 
 
-#add_executable(send_drake_to_ros
- #       Drake_to_ros.cpp
-  #      drake_to_ros_publisher.cpp)
-
-#target_link_libraries(send_drake_to_ros
- #       ${catkin_LIBRARIES}
-  #      drakeCommon
-   #     drakeSystemFramework
-    #    drakeSystemAnalysis
-     #   drakeLinearControl
-      #  drakeRBM
-       # drakeSystemPrimitives)
-
 add_executable(quad_controller
         quad_controller.cpp
         lqr_demo_subscriber.cpp
         lqr_demo_publisher.cc
         quadrotor_plant.cc)
+       # RPG_LQR_demo/RPG_Quadrotor_Plant.cpp)
 target_link_libraries(quad_controller
         ${catkin_LIBRARIES}
         drakeCommon
@@ -133,7 +98,6 @@ target_link_libraries(quad_controller
         drakeLinearControl
         drakeRigidBodyPlant
         drakeRBM
-        #drakeLCMTypes
         drake_lcmtypes
         lcm
         drakeLCMSystem2
@@ -153,13 +117,27 @@ target_link_libraries(quad_simulator
         drakeLinearControl
         drakeRigidBodyPlant
         drakeRBM
-        #drakeLCMTypes
         drake_lcmtypes
         lcm
         drakeLCMSystem2
         drakeLcm
         drakeSystemPrimitives)
 
+add_executable(rpg_quad_controller RPG_quad_controller.cpp
+        RPG_Quadrotor_Plant.cpp)
+target_link_libraries(quad_controller
+        ${catkin_LIBRARIES}
+        drakeCommon
+        drakeSystemFramework
+        drakeSystemAnalysis
+        drakeLinearControl
+        drakeRigidBodyPlant
+        drakeRBM
+        drake_lcmtypes
+        lcm
+        drakeLCMSystem2
+        drakeLcm
+        drakeSystemPrimitives)
 
 
 

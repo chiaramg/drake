@@ -127,7 +127,6 @@ std::unique_ptr<systems::AffineSystem<double>> StabilizingLQRController(
 
   Eigen::Matrix4d R = Eigen::Matrix4d::Identity();
 
-        ///hmmm.. only return D....
   return drake::systems::LinearQuadraticRegulator(*quad, *quad_context_goal, Q, R);
 }
 
